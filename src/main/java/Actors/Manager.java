@@ -94,8 +94,7 @@ public class Manager {
                 BufferedReader reader;
                 int linesCounter = 0;
                 try {
-                    reader = new BufferedReader(new FileReader(
-                            "input" + appId + ".txt"));
+                    reader = new BufferedReader(new FileReader("input" + appId + ".txt"));
                     String line = reader.readLine();
                     while (line != null) {
                         linesCounter++;
@@ -176,6 +175,8 @@ public class Manager {
                 .build();
         sqs.sendMessage(send_msg_request);
     }
+
+    //TODO - need to fix
     private static void writeLineToOutput(String line, String outputFile) {
         File fout = new File(outputFile);
         try {

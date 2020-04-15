@@ -15,9 +15,9 @@ import software.amazon.awssdk.services.sqs.model.*;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.image.BufferedImage;
+
 import java.io.*;
 import java.net.URL;
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 
@@ -71,14 +71,15 @@ public class Worker {
                 .queueUrl(queueUrlM2W)
                 .build();
 
+
         // wait for msg from manager
         while (true) {
             List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
             for (Message m : messages) {
-                String msg = m.body();
-                //TODO - processMessage not get the URL of the input file from msg - fix later
-                processMessage(sqs, queueUrlW2M, msg);
-                System.out.println("Finish to processMessage");
+                String msg = m.body();                              // appId # msg
+                String input[] = msg.split("#",2);
+                processMessage(sqs, queueUrlW2M, input[1] ,input[0]);
+                System.out.println("Finish to process Message");
             }
         }
 
@@ -96,12 +97,10 @@ public class Worker {
     }
 
 
-    private static void processMessage(SqsClient sqs, String queueUrl, String msg) throws Exception {
-        String inputFile = msg;
-        //  String inputFile ="input.txt";
+    private static void processMessage(SqsClient sqs, String queueUrl, String msg, String appId) throws Exception {
         String output = "";
         try {
-            Scanner scanner = new Scanner(inputFile);
+            Scanner scanner = new Scanner(msg);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 System.out.println(line);
@@ -113,7 +112,7 @@ public class Worker {
             e.printStackTrace();
         }
         System.out.println(output);
-        sendOutputFile(output, queueUrl, sqs);
+        sendOutputFile(output,appId, queueUrl, sqs);
     }
 
     private static String generateJPGFromPDF(String filename, String outputFileName) throws IOException {
@@ -236,7 +235,8 @@ public class Worker {
 
     }
 
-    private static void sendOutputFile(String output, String queueUrl, SqsClient sqs) {
+    private static void sendOutputFile(String output,String appId, String queueUrl, SqsClient sqs) {
+        output= "PDF task done#"+appId+"#"+output;
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(queueUrl)
                 .messageBody(output)
