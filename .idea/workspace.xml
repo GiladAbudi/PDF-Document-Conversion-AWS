@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1aRgunaE4Y0nEF0ry6x88Jzwiqk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RunManager" selected="Application.Manager">
+    <configuration name="EC2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Cloud.EC2" />
+      <module name="Dsp1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Cloud.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LocalApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="App.LocalApp" />
+      <module name="Dsp1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="App.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Manager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Actors.Manager" />
+      <module name="Dsp1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Actors.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="S3" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Cloud.S3" />
+      <module name="Dsp1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Cloud.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Worker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Actors.Worker" />
+      <module name="Dsp1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Actors.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Manager" />
+        <item itemvalue="Application.LocalApp" />
+        <item itemvalue="Application.Worker" />
+        <item itemvalue="Application.S3" />
+        <item itemvalue="Application.EC2" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="" />
+      <created>1586704045514</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586704045514</updated>
+      <workItem from="1586704049980" duration="7854000" />
+      <workItem from="1586795952686" duration="25950000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="361" y="71" key="#Project_Structure" timestamp="1586768963018">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="361" y="71" key="#Project_Structure/0.0.1536.826@0.0.1536.826" timestamp="1586768963018" />
+    <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog" timestamp="1586773441159">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog/0.0.1536.826@0.0.1536.826" timestamp="1586773441159" />
+    <state x="549" y="154" key="FileChooserDialogImpl" timestamp="1586769521559">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1586769521559" />
+    <state width="1492" height="256" key="GridCell.Tab.0.bottom" timestamp="1586946882192">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
+    <state width="1492" height="256" key="GridCell.Tab.0.center" timestamp="1586946882192">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
+    <state width="1492" height="256" key="GridCell.Tab.0.left" timestamp="1586946882192">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
+    <state width="1492" height="256" key="GridCell.Tab.0.right" timestamp="1586946882192">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
+    <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1586946887151">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.1.bottom/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
+    <state width="1492" height="256" key="GridCell.Tab.1.center" timestamp="1586946887151">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.1.center/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
+    <state width="1492" height="256" key="GridCell.Tab.1.left" timestamp="1586946887151">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.1.left/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
+    <state width="1492" height="256" key="GridCell.Tab.1.right" timestamp="1586946887151">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state width="1492" height="256" key="GridCell.Tab.1.right/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
+    <state x="277" y="0" key="SettingsEditor" timestamp="1586945439498">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1586945439498" />
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1586795952188">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.826@0.0.1536.826" timestamp="1586795952188" />
+    <state x="209" y="114" key="new project wizard" timestamp="1586769648430">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="209" y="114" key="new project wizard/0.0.1536.826@0.0.1536.826" timestamp="1586769648430" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
+          <line>81</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/App/LocalApp.java</url>
+          <line>62</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
+          <line>61</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
