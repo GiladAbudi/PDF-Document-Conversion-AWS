@@ -15,6 +15,9 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Manager {
     private static S3Client s3;
@@ -25,6 +28,7 @@ public class Manager {
 
 
     public static void main(String args[]) {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         Region region = Region.US_EAST_1;
         sqs = SqsClient.builder().region(region).build();
         s3 = S3Client.builder().region(region).build();
@@ -53,8 +57,6 @@ public class Manager {
                 .build();
         String workerIQUrl = sqs.getQueueUrl(getQueueRequest1).queueUrl();
         String workerOQUrl = sqs.getQueueUrl(getQueueRequest2).queueUrl();
-
-
         while (true) {
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                     .queueUrl(appQueueUrl)
@@ -111,8 +113,8 @@ public class Manager {
                         .receiptHandle(m.receiptHandle())
                         .build();
                 sqs.deleteMessage(deleteRequest);
-                // Another thread handles this
-                handleWorkersOutput(linesCounter, workerOQUrl, appId, bucket, key, appQueueUrl);
+                AppHandler handler = new AppHandler(linesCounter,workerOQUrl,appId,bucket,key,appQueueUrl);
+                executor.execute(handler);
                 try {
                     Thread.sleep(5000);
                 }
@@ -121,14 +123,15 @@ public class Manager {
                     }
             }
             if (terminate) {
-                //TODO wait for the other thread to finish working
-                break;
+                executor.shutdown();
+                try {
+                    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                } catch (InterruptedException e) {
+                    System.out.println("got interrupted exception " + e.getMessage());
+                }
             }
         }
-
-
     }
-
     private static void handleInputLine(String queue, String line, String appId) {
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(queue)
@@ -138,7 +141,7 @@ public class Manager {
         sqs.sendMessage(send_msg_request);
     }
 
-    private static void handleWorkersOutput(int counter, String queue, String appId, String bucket, String key, String appQueue) {
+    public static void handleWorkersOutput(int counter, String queue, String appId, String bucket, String key, String appQueue) {
         int lineCount = counter;
         String outputFile = "output" + appId + ".txt";
         while (lineCount != 0) {
@@ -160,7 +163,6 @@ public class Manager {
                                 .receiptHandle(m.receiptHandle())
                                 .build();
                         sqs.deleteMessage(deleteRequest);
-
                     }
                 }
             }
