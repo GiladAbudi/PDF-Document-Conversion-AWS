@@ -57,6 +57,7 @@ public class Manager {
                 .build();
         String workerIQUrl = sqs.getQueueUrl(getQueueRequest1).queueUrl();
         String workerOQUrl = sqs.getQueueUrl(getQueueRequest2).queueUrl();
+        CleanQueues(workerIQUrl,workerOQUrl);
         boolean terminate = false;
         while (!terminate) {
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
@@ -93,6 +94,8 @@ public class Manager {
                     }
                     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key(key).build();
                     s3.deleteObject(deleteObjectRequest);
+                    File f = new File("input" + appId + ".txt");
+                    f.delete();
                     BufferedReader reader;
                     int linesCounter = 0;
                     try {
@@ -179,6 +182,8 @@ public class Manager {
                 .delaySeconds(5)
                 .build();
         sqs.sendMessage(send_msg_request);
+        File f = new File(outputFile);
+        f.delete();
     }
 
 
@@ -193,5 +198,10 @@ public class Manager {
         {
             System.err.println("IOException: " + ioe.getMessage());
         }
+    }
+
+    private static void CleanQueues(String queue1,String queue2) {
+        sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue1).build());
+        sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue2).build());
     }
 }

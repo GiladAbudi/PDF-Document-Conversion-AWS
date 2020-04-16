@@ -39,7 +39,7 @@ public class Worker {
         String queueNameManager2Worker = "M2W";
 
         SqsClient sqs = SqsClient.builder().region(Region.US_EAST_1).build();
-        bucket = "bucket1586960757979";//"bucket" + System.currentTimeMillis();
+        bucket = "bucket1586960757979w";//"bucket" + System.currentTimeMillis();
 
         //s3 instance
         s3 = S3Client.builder().region(Region.US_EAST_1).build();
@@ -93,7 +93,6 @@ public class Worker {
 
     }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -140,8 +139,9 @@ public class Worker {
         } catch (Exception e) {
             return "cantUploadFile";
         }
+        removeFile(outputFileName+".jpg");
+        removeFile(outputFileName+".pdf");
         System.out.println("WORK JPG");
-
         return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".jpg";
     }
 
@@ -169,6 +169,8 @@ public class Worker {
         pdf.close();
         pdf1.close();
         output.close();
+        removeFile(outputFileName+".html");
+        removeFile(outputFileName+".pdf");
         System.out.println("WORK HTML");
         return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".html";
     }
@@ -197,6 +199,8 @@ public class Worker {
         }
         pdDoc.close();
         pw.close();
+        removeFile(outputFileName+".txt");
+        removeFile(outputFileName+".pdf");
         System.out.println("WORK TEXT");
         return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".txt";
     }
@@ -260,8 +264,8 @@ public class Worker {
 
     }
 
-    private static void removeFile (String fileName) throws Exception {
+    private static void removeFile (String fileName) {
         File f = new File(fileName);
-
+        f.delete();
     }
 }
