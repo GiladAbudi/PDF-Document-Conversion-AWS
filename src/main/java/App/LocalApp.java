@@ -32,7 +32,7 @@ public class LocalApp {
         s3 = S3Client.builder().region(region).build();
         String linesPerWorker = "5";//args[3]
         String outputName = "output.txt";//args [2]
-        String inputFile = "C:\\Users\\user1\\Desktop\\file.txt"; // args[1]
+        String inputFile = "file.txt"; // args[1]
         boolean terminate = false; //args[4]
         String queueName = appManagerQueue;
         String appId = ""+ System.currentTimeMillis();
@@ -61,18 +61,24 @@ public class LocalApp {
                 .delaySeconds(5)
                 .build();
         sqs.sendMessage(send_msg_request);
+
         try {
             Thread.sleep(5000);
-                ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
+            ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                         .queueUrl(queueUrl)
                         .build();
+            String fileLink = "";
+            while(true){
                 List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
-                String fileLink = "";
-                for (Message m : messages) {
-                    String body = m.body();
-                    if (body.contains("Done task")) {
-                        fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+
+                    for (Message m : messages) {
+                        String body = m.body();
+                        if (body.contains("Done task")) {
+                            fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+                        }
                     }
+                    if(!fileLink.equals(""))
+                        break;
                 }
             try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
                  FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
