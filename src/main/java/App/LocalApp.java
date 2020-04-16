@@ -36,7 +36,7 @@ public class LocalApp {
         boolean terminate = false; //args[4]
         String queueName = appManagerQueue;
         String appId = ""+ System.currentTimeMillis();
-        String key = inputFile;
+        String key = appId+inputFile;
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));

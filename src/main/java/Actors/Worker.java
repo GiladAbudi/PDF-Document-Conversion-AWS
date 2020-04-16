@@ -111,7 +111,7 @@ public class Worker {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 System.out.println(line);
-                output += ActionOnPDFfile(line);
+                output += ActionOnPDFfile(line,appId);
                 // process the line
             }
             scanner.close();
@@ -122,7 +122,7 @@ public class Worker {
         sendOutputFile(output,appId, queueUrl, sqs);
     }
 
-    private static String generateJPGFromPDF(String filename, String outputFileName) throws IOException {
+    private static String generateJPGFromPDF(String filename, String outputFileName, String appId) throws IOException {
         PDDocument pd = null;
         try {
             pd = PDDocument.load(new File(filename));
@@ -135,19 +135,19 @@ public class Worker {
         ImageIO.write(bi, "JPG", new File(outputFileName + ".jpg"));
         pd.close();
         try {
-            uploadFileToS3(outputFileName, ".jpg");
+            uploadFileToS3(appId+outputFileName, ".jpg");
         } catch (Exception e) {
             return "cantUploadFile";
         }
         removeFile(outputFileName+".jpg");
         removeFile(outputFileName+".pdf");
         System.out.println("WORK JPG");
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".jpg";
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".jpg";
     }
 
 
     //TODO -FIX THROW EXCEPTION
-    private static String generateHTMLFromPDF(String filename, String outputFileName) throws IOException {
+    private static String generateHTMLFromPDF(String filename, String outputFileName, String appId) throws IOException {
         PDDocument pdf = null;
         try {
             pdf = PDDocument.load(new File(filename));
@@ -160,7 +160,7 @@ public class Worker {
         try {
 
             new PDFDomTree().writeText(pdf1, output);
-            uploadFileToS3(outputFileName, ".html");
+            uploadFileToS3(appId+outputFileName, ".html");
         } catch (ParserConfigurationException e) {
             return "cant-generateHTML";
         } catch (Exception e) {
@@ -172,10 +172,10 @@ public class Worker {
         removeFile(outputFileName+".html");
         removeFile(outputFileName+".pdf");
         System.out.println("WORK HTML");
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".html";
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".html";
     }
 
-    private static String generateTEXTFromPDF(String filename, String outputFileName) throws IOException {
+    private static String generateTEXTFromPDF(String filename, String outputFileName, String appId) throws IOException {
         File f = new File(filename);
         String parsedText;
         PDFParser parser = new PDFParser(new RandomAccessFile(f, "r"));
@@ -193,7 +193,7 @@ public class Worker {
         pw.print(parsedText);
         //upload the file to S3
         try {
-            uploadFileToS3(outputFileName, ".txt");
+            uploadFileToS3(appId+outputFileName, ".txt");
         } catch (Exception e) {
             return "cantUploadFile";
         }
@@ -202,7 +202,7 @@ public class Worker {
         removeFile(outputFileName+".txt");
         removeFile(outputFileName+".pdf");
         System.out.println("WORK TEXT");
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".txt";
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".txt";
     }
 
 
@@ -225,7 +225,7 @@ public class Worker {
         return firstPage;
     }
 
-    private static String ActionOnPDFfile(String line) throws Exception {
+    private static String ActionOnPDFfile(String line,String appId) throws Exception {
         String res = "";
         String[] pharseline = line.split("\t");
         String action = pharseline[0];
@@ -236,11 +236,11 @@ public class Worker {
 
         res = downloadPDF(url, fileName);     //download the pdf
         if (res.equals("") && action.equals("ToImage"))
-            res = generateJPGFromPDF(fileName, name);
+            res = generateJPGFromPDF(fileName, name, appId);
         else if (res.equals("") && action.equals("ToHTML"))
-            res = generateHTMLFromPDF(fileName, name);
+            res = generateHTMLFromPDF(fileName, name, appId);
         else if (res.equals("") && action.equals("ToText"))
-            res = generateTEXTFromPDF(fileName, name);
+            res = generateTEXTFromPDF(fileName, name, appId);
 
         return action + '\t' + url + '\t' + res + '\n';
 
