@@ -77,7 +77,7 @@ public class Manager {
                     if(split.length>5){
                         terminate=true;
                     }
-                }
+
                 fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
                 try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream("input" + appId + ".txt")) {
@@ -123,6 +123,7 @@ public class Manager {
             if (terminate) {
                 //TODO wait for the other thread to finish working
                 break;
+            }
             }
         }
 

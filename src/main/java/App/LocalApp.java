@@ -32,7 +32,7 @@ public class LocalApp {
         s3 = S3Client.builder().region(region).build();
         String linesPerWorker = "5";//args[3]
         String outputName = "output.txt";//args [2]
-        String inputFile = "C:\\Users\\gilad\\Desktop\\file.txt"; // args[1]
+        String inputFile = "file.txt"; // args[1]
         boolean terminate = false; //args[4]
         String queueName = appManagerQueue;
         String appId = ""+ System.currentTimeMillis();

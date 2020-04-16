@@ -163,7 +163,6 @@ public class Worker {
             uploadFileToS3(outputFileName, ".html");
         } catch (ParserConfigurationException e) {
             return "cant-generateHTML";
-            // e.printStackTrace();
         } catch (Exception e) {
             return "cantUploadFile";
         }
@@ -258,6 +257,11 @@ public class Worker {
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(outputFileName + type).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(outputFileName + type)));
+
     }
 
+    private static void removeFile (String fileName) throws Exception {
+        File f = new File(fileName);
+
+    }
 }
