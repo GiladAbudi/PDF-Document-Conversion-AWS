@@ -69,6 +69,8 @@ public class Worker {
 
         ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrlM2W)
+                .maxNumberOfMessages(3)
+                .visibilityTimeout(120)
                 .build();
 
 
@@ -80,6 +82,12 @@ public class Worker {
                 String input[] = msg.split("#",2);
                 processMessage(sqs, queueUrlW2M, input[1] ,input[0]);
                 System.out.println("Finish to process Message");
+                DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                        .queueUrl(queueUrlM2W)
+                        .receiptHandle(m.receiptHandle())
+                        .build();
+                sqs.deleteMessage(deleteRequest);
+                System.out.println("Delete the Message from SQS");
             }
         }
 

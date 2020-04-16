@@ -40,7 +40,7 @@ public class Manager {
             CreateQueueRequest request2 = CreateQueueRequest.builder()
                     .queueName(workerOQ)
                     .build();
-            CreateQueueResponse create_result2 = sqs.createQueue(request);
+            CreateQueueResponse create_result2 = sqs.createQueue(request2);
 
         } catch (QueueNameExistsException e) {
             throw e;
@@ -176,19 +176,17 @@ public class Manager {
         sqs.sendMessage(send_msg_request);
     }
 
-    //TODO - need to fix
+
     private static void writeLineToOutput(String line, String outputFile) {
-        File fout = new File(outputFile);
-        try {
-            FileOutputStream fos = new FileOutputStream(fout);
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-                for (int i = 0; i < 10; i++) {
-                    bw.write(line);
-                    bw.newLine();
-                }
-                bw.close();
-        } catch (Exception  e) {
-            e.printStackTrace();
+        try
+        {
+            FileWriter fw = new FileWriter(outputFile,true); //the true will append the new data
+            fw.write(line);//appends the string to the file
+            fw.close();
+        }
+        catch(IOException ioe)
+        {
+            System.err.println("IOException: " + ioe.getMessage());
         }
     }
 }
