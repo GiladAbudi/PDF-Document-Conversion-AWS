@@ -43,7 +43,7 @@ public class Worker {
 
         //s3 instance
         s3 = S3Client.builder().region(Region.US_EAST_1).build();
-        createBucket(bucket);
+        //createBucket(bucket);
 
         // create queue
         try {
