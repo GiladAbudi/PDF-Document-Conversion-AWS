@@ -94,8 +94,7 @@ public class Manager {
                     }
                     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key(key).build();
                     s3.deleteObject(deleteObjectRequest);
-                    File f = new File("input" + appId + ".txt");
-                    f.delete();
+
                     BufferedReader reader;
                     int linesCounter = 0;
                     try {
@@ -108,6 +107,8 @@ public class Manager {
                             line = reader.readLine();
                         }
                         reader.close();
+                        File f = new File("input" + appId + ".txt");
+                        f.delete();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -133,6 +134,12 @@ public class Manager {
                         }
                         terminate=true;
                         break;
+                    }
+                }else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }

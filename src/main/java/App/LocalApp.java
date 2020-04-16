@@ -76,6 +76,11 @@ public class LocalApp {
                         if (split[1].equals(appId)) {
                             done = true;
                             fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+                            DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                                    .queueUrl(queueUrl)
+                                    .receiptHandle(m.receiptHandle())
+                                    .build();
+                            sqs.deleteMessage(deleteRequest);
                             if (!fileLink.equals(""))
                                 break;
 
@@ -89,6 +94,7 @@ public class LocalApp {
                             } catch (IOException e) {
                                 System.out.println(e.getMessage());
                             }
+
                         }
                     }
                 }
