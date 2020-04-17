@@ -23,6 +23,7 @@ public class Manager {
     private static S3Client s3;
     private static SqsClient sqs;
     private static final String appManagerQueue = "appManagerQueue";
+    private static final String managerAppQueue = "managerAppQueue";
     private static final String workerIQ = "M2W";
     private static final String workerOQ = "W2M";
 
@@ -36,27 +37,12 @@ public class Manager {
                 .queueName(appManagerQueue)
                 .build();
         String appQueueUrl = sqs.getQueueUrl(getQueueRequest).queueUrl();
-        try {
-            CreateQueueRequest request = CreateQueueRequest.builder()
-                    .queueName(workerIQ)
-                    .build();
-            CreateQueueResponse create_result = sqs.createQueue(request);
-            CreateQueueRequest request2 = CreateQueueRequest.builder()
-                    .queueName(workerOQ)
-                    .build();
-            CreateQueueResponse create_result2 = sqs.createQueue(request2);
-
-        } catch (QueueNameExistsException e) {
-            throw e;
-        }
-        GetQueueUrlRequest getQueueRequest1 = GetQueueUrlRequest.builder()
-                .queueName(workerIQ)
+        getQueueRequest = GetQueueUrlRequest.builder()
+                .queueName(managerAppQueue)
                 .build();
-        GetQueueUrlRequest getQueueRequest2 = GetQueueUrlRequest.builder()
-                .queueName(workerOQ)
-                .build();
-        String workerIQUrl = sqs.getQueueUrl(getQueueRequest1).queueUrl();
-        String workerOQUrl = sqs.getQueueUrl(getQueueRequest2).queueUrl();
+        String toAppUrl = sqs.getQueueUrl((getQueueRequest)).queueUrl();
+        String workerIQUrl = createQueue(workerIQ);
+        String workerOQUrl = createQueue(workerOQ);
         CleanQueues(workerIQUrl,workerOQUrl);
         boolean terminate = false;
         while (!terminate) {
@@ -80,7 +66,14 @@ public class Manager {
                     if (split.length > 5) {
                         terminate = true;
                     }
-
+                    try {
+                        File input= new File("input" + appId + ".txt");
+                        if (!input.exists()) {
+                            input.createNewFile();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
                     try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
                          FileOutputStream fileOutputStream = new FileOutputStream("input" + appId + ".txt")) {
@@ -117,7 +110,7 @@ public class Manager {
                             .receiptHandle(m.receiptHandle())
                             .build();
                     sqs.deleteMessage(deleteRequest);
-                    AppHandler handler = new AppHandler(linesCounter, workerOQUrl, appId, bucket, key, appQueueUrl);
+                    AppHandler handler = new AppHandler(linesCounter, workerOQUrl, appId, bucket, key, toAppUrl);
                     executor.execute(handler);
                     try {
                         Thread.sleep(5000);
@@ -210,5 +203,20 @@ public class Manager {
     private static void CleanQueues(String queue1,String queue2) {
         sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue1).build());
         sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue2).build());
+    }
+
+    private static String createQueue(String queue) {
+        try {
+            CreateQueueRequest request = CreateQueueRequest.builder()
+                    .queueName(queue)
+                    .build();
+            sqs.createQueue(request);
+        } catch (QueueNameExistsException e) {
+            throw e;
+        }
+        GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
+                .queueName(queue)
+                .build();
+        return sqs.getQueueUrl(getQueueRequest).queueUrl();
     }
 }

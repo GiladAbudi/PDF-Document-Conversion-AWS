@@ -25,6 +25,7 @@ public class LocalApp {
     private static S3Client s3;
     private static SqsClient sqs;
     private static final String appManagerQueue = "appManagerQueue";
+    private static final String managerAppQueue = "managerAppQueue";
     private static String bucket = "bucket1586960757979l";
     public static void main(String[] args) {
         Region region = Region.US_EAST_1;
@@ -34,27 +35,18 @@ public class LocalApp {
         String outputName = "output.txt";//args [2]
         String inputFile = "file.txt"; // args[1]
         boolean terminate = false; //args[4]
-        String queueName = appManagerQueue;
+        String queueNameOut = appManagerQueue;
+        String queueNameIn = managerAppQueue;
         String appId = ""+ System.currentTimeMillis();
         String key = appId+inputFile;
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));
 
-        try {
-            CreateQueueRequest request = CreateQueueRequest.builder()
-                    .queueName(queueName)
-                    .build();
-           CreateQueueResponse create_result = sqs.createQueue(request);
-        } catch (QueueNameExistsException e) {
-            throw e;
-        }
-        GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
-                .queueName(queueName)
-                .build();
-        String queueUrl = sqs.getQueueUrl(getQueueRequest).queueUrl();
+        String queueOutUrl = createQueue(queueNameOut);
+        String queueInUrl = createQueue(queueNameIn);
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
-                .queueUrl(queueUrl)
+                .queueUrl(queueOutUrl)
                 .messageBody("New Task#" + bucket + "#" + key + "#" + linesPerWorker + "#" + appId)
                 .delaySeconds(5)
                 .build();
@@ -65,7 +57,7 @@ public class LocalApp {
             try {
                 Thread.sleep(1000);
                 ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
-                        .queueUrl(queueUrl)
+                        .queueUrl(queueInUrl)
                         .build();
                 String fileLink = "";
                 List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
@@ -80,14 +72,22 @@ public class LocalApp {
                             System.out.println("done = true");
                             fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
                             DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
-                                    .queueUrl(queueUrl)
+                                    .queueUrl(queueInUrl)
                                     .receiptHandle(m.receiptHandle())
                                     .build();
                             sqs.deleteMessage(deleteRequest);
                             if (!fileLink.equals(""))
                                 break;
-
+                            try {
+                                File output = new File(outputName);
+                                if (!output.exists()) {
+                                    output.createNewFile();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
+
                                  FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
                                 byte[] dataBuffer = new byte[1024];
                                 int bytesRead;
@@ -107,6 +107,22 @@ public class LocalApp {
             }
         }
     }
+
+    private static String createQueue(String queue) {
+        try {
+            CreateQueueRequest request = CreateQueueRequest.builder()
+                    .queueName(queue)
+                    .build();
+            sqs.createQueue(request);
+        } catch (QueueNameExistsException e) {
+            throw e;
+        }
+        GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
+                .queueName(queue)
+                .build();
+        return sqs.getQueueUrl(getQueueRequest).queueUrl();
+    }
+
     private static void createBucket(String bucket) {
         s3.createBucket(CreateBucketRequest
                 .builder()
