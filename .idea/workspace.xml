@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/DeleteBuckets.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inputFile114.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/file.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Actors/Manager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Manager.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Actors/Worker.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Worker.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/App/LocalApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/App/LocalApp.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +44,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Application.Manager">
+  <component name="RunManager" selected="Application.LocalApp">
     <configuration name="EC2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Cloud.EC2" />
       <module name="Dsp1" />
@@ -119,9 +119,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Manager" />
-        <item itemvalue="Application.LocalApp" />
         <item itemvalue="Application.Worker" />
+        <item itemvalue="Application.LocalApp" />
+        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.S3" />
         <item itemvalue="Application.EC2" />
       </list>
@@ -170,22 +170,22 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1586769521559" />
-    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587053927709">
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587062594645">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587053927709" />
-    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587053927709">
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587062594645" />
+    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587062594645">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587053927709" />
-    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587053927709">
+    <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587062594645" />
+    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587062594645">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587053927709" />
-    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587053927709">
+    <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587062594645" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587062594645">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587053927709" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587062594645" />
     <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1586946887151">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -225,7 +225,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/App/LocalApp.java</url>
-          <line>62</line>
+          <line>63</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

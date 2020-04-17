@@ -60,9 +60,10 @@ public class LocalApp {
                 .build();
         boolean done = false;
         sqs.sendMessage(send_msg_request);
+        System.out.println("sent msg to manager");
         while (!done) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
                 ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                         .queueUrl(queueUrl)
                         .build();
@@ -72,9 +73,16 @@ public class LocalApp {
                 for (Message m : messages) {
                     String body = m.body();
                     if (body.contains("Done task")) {
+                        System.out.println("got done task");
                         String[] split = body.split("#", 2);
                         if (split[1].equals(appId)) {
+                            DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                                    .queueUrl(queueUrl)
+                                    .receiptHandle(m.receiptHandle())
+                                    .build();
+                            sqs.deleteMessage(deleteRequest);
                             done = true;
+                            System.out.println("done = true");
                             fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
                             DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
                                     .queueUrl(queueUrl)
@@ -91,8 +99,9 @@ public class LocalApp {
                                 while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                                     fileOutputStream.write(dataBuffer, 0, bytesRead);
                                 }
+                                sqs.deleteMessage(deleteRequest);
                             } catch (IOException e) {
-                                System.out.println(e.getMessage());
+                                e.printStackTrace();
                             }
 
                         }
