@@ -39,11 +39,11 @@ public class Worker {
         String queueNameManager2Worker = "M2W";
 
         SqsClient sqs = SqsClient.builder().region(Region.US_EAST_1).build();
-        bucket = "bucket1586960757979";//"bucket" + System.currentTimeMillis();
+        bucket = "bucket1586960757979w";//"bucket" + System.currentTimeMillis();
 
         //s3 instance
         s3 = S3Client.builder().region(Region.US_EAST_1).build();
-        createBucket(bucket);
+        //createBucket(bucket);
 
         // create queue
         try {
@@ -93,7 +93,6 @@ public class Worker {
 
     }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -112,7 +111,7 @@ public class Worker {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 System.out.println(line);
-                output += ActionOnPDFfile(line);
+                output += ActionOnPDFfile(line,appId);
                 // process the line
             }
             scanner.close();
@@ -123,35 +122,40 @@ public class Worker {
         sendOutputFile(output,appId, queueUrl, sqs);
     }
 
-    private static String generateJPGFromPDF(String filename, String outputFileName) throws IOException {
+    private static String generatePNGFromPDF(String filename, String outputFileName, String appId) throws IOException {
         PDDocument pd = null;
         try {
             pd = PDDocument.load(new File(filename));
         } catch (IOException e) {
+            removeFile(outputFileName +".pdf");
             return "cant-load-PDF";
         }
 
         PDFRenderer pr = new PDFRenderer(fisrtPageOfPDFfile(pd));
         BufferedImage bi = pr.renderImageWithDPI(0, 300);
-        ImageIO.write(bi, "JPG", new File(outputFileName + ".jpg"));
+        ImageIO.write(bi, "PNG", new File(outputFileName + ".png"));
         pd.close();
         try {
-            uploadFileToS3(outputFileName, ".jpg");
+            uploadFileToS3(outputFileName, appId,  ".png");
         } catch (Exception e) {
+            removeFile(outputFileName +".pdf");
+            removeFile(outputFileName +".png");
             return "cantUploadFile";
         }
-        System.out.println("WORK JPG");
-
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".jpg";
+        removeFile(outputFileName +".pdf");
+        removeFile(outputFileName +".png");
+        System.out.println("WORK PNG");
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".png";
     }
 
 
-    //TODO -FIX THROW EXCEPTION
-    private static String generateHTMLFromPDF(String filename, String outputFileName) throws IOException {
+
+    private static String generateHTMLFromPDF(String filename, String outputFileName, String appId) throws IOException {
         PDDocument pdf = null;
         try {
             pdf = PDDocument.load(new File(filename));
         } catch (IOException e) {
+            removeFile(outputFileName +".pdf");
             return "cant-load-PDF";
         }
         PDDocument pdf1 = fisrtPageOfPDFfile(pdf);
@@ -160,27 +164,31 @@ public class Worker {
         try {
 
             new PDFDomTree().writeText(pdf1, output);
-            uploadFileToS3(outputFileName, ".html");
+            uploadFileToS3(outputFileName, appId,  ".html");
         } catch (ParserConfigurationException e) {
+            removeFile(outputFileName +".pdf");
             return "cant-generateHTML";
         } catch (Exception e) {
+            removeFile(outputFileName +".pdf");
             return "cantUploadFile";
         }
         pdf.close();
         pdf1.close();
         output.close();
+        removeFile(outputFileName +".html");
+        removeFile(outputFileName +".pdf");
         System.out.println("WORK HTML");
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".html";
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".html";
     }
 
-    private static String generateTEXTFromPDF(String filename, String outputFileName) throws IOException {
+    private static String generateTEXTFromPDF(String filename, String outputFileName, String appId) throws IOException {
         File f = new File(filename);
         String parsedText;
         PDFParser parser = new PDFParser(new RandomAccessFile(f, "r"));
         try {
             parser.parse();
         } catch (IOException e) {
-
+            removeFile(outputFileName +".pdf");
             return "cant-parse-to-text";
         }
         COSDocument cosDoc = parser.getDocument();
@@ -191,14 +199,18 @@ public class Worker {
         pw.print(parsedText);
         //upload the file to S3
         try {
-            uploadFileToS3(outputFileName, ".txt");
+            uploadFileToS3(outputFileName, appId, ".txt");
         } catch (Exception e) {
+            removeFile(outputFileName +".txt");
+            removeFile(outputFileName +".pdf");
             return "cantUploadFile";
         }
         pdDoc.close();
         pw.close();
+        removeFile(outputFileName +".txt");
+        removeFile(outputFileName +".pdf");
         System.out.println("WORK TEXT");
-        return "https://" + bucket + ".s3.amazonaws.com/" + outputFileName + ".txt";
+        return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".txt";
     }
 
 
@@ -209,6 +221,7 @@ public class Worker {
             in = url.openStream();
             Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            removeFile(fileName +".pdf");
             return "cant-access-to-file";
         }
         System.out.println("WORK download");
@@ -221,7 +234,7 @@ public class Worker {
         return firstPage;
     }
 
-    private static String ActionOnPDFfile(String line) throws Exception {
+    private static String ActionOnPDFfile(String line,String appId) throws Exception {
         String res = "";
         String[] pharseline = line.split("\t");
         String action = pharseline[0];
@@ -232,11 +245,11 @@ public class Worker {
 
         res = downloadPDF(url, fileName);     //download the pdf
         if (res.equals("") && action.equals("ToImage"))
-            res = generateJPGFromPDF(fileName, name);
+            res = generatePNGFromPDF(fileName, name, appId);
         else if (res.equals("") && action.equals("ToHTML"))
-            res = generateHTMLFromPDF(fileName, name);
+            res = generateHTMLFromPDF(fileName, name, appId);
         else if (res.equals("") && action.equals("ToText"))
-            res = generateTEXTFromPDF(fileName, name);
+            res = generateTEXTFromPDF(fileName, name, appId);
 
         return action + '\t' + url + '\t' + res + '\n';
 
@@ -253,15 +266,16 @@ public class Worker {
         System.out.println("Finish send msg to manager");
     }
 
-    private static void uploadFileToS3(String outputFileName, String type) throws Exception {
-        s3.putObject(PutObjectRequest.builder().bucket(bucket).key(outputFileName + type).acl(ObjectCannedACL.PUBLIC_READ)
+    private static void uploadFileToS3(String outputFileName,String appId, String type) throws Exception {
+        s3.putObject(PutObjectRequest.builder().bucket(bucket).key(appId + outputFileName + type).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(outputFileName + type)));
 
     }
 
-    private static void removeFile (String fileName) throws Exception {
+    private static void removeFile (String fileName) {
         File f = new File(fileName);
-
+        f.delete();
+        System.out.println("-- remove" + fileName + " complete --");
     }
 }

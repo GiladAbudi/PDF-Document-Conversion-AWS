@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="" />
+    <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Actors/Manager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Manager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Actors/Worker.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Worker.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/App/LocalApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/App/LocalApp.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,7 +21,13 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1aRgunaE4Y0nEF0ry6x88Jzwiqk" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -24,6 +37,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="extract.method.default.visibility" value="private" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -96,11 +110,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Application.EC2" />
+      <item itemvalue="Application.LocalApp" />
+      <item itemvalue="Application.Manager" />
+      <item itemvalue="Application.S3" />
+      <item itemvalue="Application.Worker" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Manager" />
-        <item itemvalue="Application.LocalApp" />
         <item itemvalue="Application.Worker" />
+        <item itemvalue="Application.LocalApp" />
         <item itemvalue="Application.S3" />
         <item itemvalue="Application.EC2" />
       </list>
@@ -149,22 +170,22 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1586769521559" />
-    <state width="1492" height="256" key="GridCell.Tab.0.bottom" timestamp="1586946882192">
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587126536357">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="256" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
-    <state width="1492" height="256" key="GridCell.Tab.0.center" timestamp="1586946882192">
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
+    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587126536357">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="256" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
-    <state width="1492" height="256" key="GridCell.Tab.0.left" timestamp="1586946882192">
+    <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
+    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587126536357">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="256" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
-    <state width="1492" height="256" key="GridCell.Tab.0.right" timestamp="1586946882192">
+    <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587126536357">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="256" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1586946882192" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
     <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1586946887151">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -189,6 +210,10 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.826@0.0.1536.826" timestamp="1586795952188" />
+    <state x="499" y="168" key="extract.method.dialog" timestamp="1587125210205">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="499" y="168" key="extract.method.dialog/0.0.1536.826@0.0.1536.826" timestamp="1587125210205" />
     <state x="209" y="114" key="new project wizard" timestamp="1586769648430">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -199,17 +224,17 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>81</line>
+          <line>76</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/App/LocalApp.java</url>
-          <line>62</line>
+          <line>55</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>61</line>
+          <line>50</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>

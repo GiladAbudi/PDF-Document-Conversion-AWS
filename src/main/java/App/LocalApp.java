@@ -25,7 +25,8 @@ public class LocalApp {
     private static S3Client s3;
     private static SqsClient sqs;
     private static final String appManagerQueue = "appManagerQueue";
-
+    private static final String managerAppQueue = "managerAppQueue";
+    private static String bucket = "bucket1586960757979l";
     public static void main(String[] args) {
         Region region = Region.US_EAST_1;
         sqs = SqsClient.builder().region(region).build();
@@ -34,68 +35,94 @@ public class LocalApp {
         String outputName = "output.txt";//args [2]
         String inputFile = "file.txt"; // args[1]
         boolean terminate = false; //args[4]
-        String queueName = appManagerQueue;
+        String queueNameOut = appManagerQueue;
+        String queueNameIn = managerAppQueue;
         String appId = ""+ System.currentTimeMillis();
-        String bucket = "bucket" + appId;
-        String key = "key";
-        createBucket(bucket);
+        String key = appId+inputFile;
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));
 
+        String queueOutUrl = createQueue(queueNameOut);
+        String queueInUrl = createQueue(queueNameIn);
+        SendMessageRequest send_msg_request = SendMessageRequest.builder()
+                .queueUrl(queueOutUrl)
+                .messageBody("New Task#" + bucket + "#" + key + "#" + linesPerWorker + "#" + appId)
+                .delaySeconds(5)
+                .build();
+        boolean done = false;
+        sqs.sendMessage(send_msg_request);
+        System.out.println("sent msg to manager");
+        while (!done) {
+            try {
+                Thread.sleep(1000);
+                ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
+                        .queueUrl(queueInUrl)
+                        .build();
+                String fileLink = "";
+                List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
+
+                for (Message m : messages) {
+                    String body = m.body();
+                    if (body.contains("Done task")) {
+                        System.out.println("got done task");
+                        String[] split = body.split("#", 2);
+                        if (split[1].equals(appId)) {
+                            done = true;
+                            System.out.println("done = true");
+                            fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+                            DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                                    .queueUrl(queueInUrl)
+                                    .receiptHandle(m.receiptHandle())
+                                    .build();
+                            sqs.deleteMessage(deleteRequest);
+                            if (!fileLink.equals(""))
+                                break;
+                            try {
+                                File output = new File(outputName);
+                                if (!output.exists()) {
+                                    output.createNewFile();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
+
+                                 FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
+                                byte[] dataBuffer = new byte[1024];
+                                int bytesRead;
+                                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+                                }
+                                sqs.deleteMessage(deleteRequest);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                System.out.println("got interrupted exception " + e.getMessage());
+            }
+        }
+    }
+
+    private static String createQueue(String queue) {
         try {
             CreateQueueRequest request = CreateQueueRequest.builder()
-                    .queueName(queueName)
+                    .queueName(queue)
                     .build();
-           CreateQueueResponse create_result = sqs.createQueue(request);
+            sqs.createQueue(request);
         } catch (QueueNameExistsException e) {
             throw e;
         }
         GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
-                .queueName(queueName)
+                .queueName(queue)
                 .build();
-        String queueUrl = sqs.getQueueUrl(getQueueRequest).queueUrl();
-        SendMessageRequest send_msg_request = SendMessageRequest.builder()
-                .queueUrl(queueUrl)
-                .messageBody("New Task#"+bucket+"#"+key+"#"+linesPerWorker+"#"+appId)
-                .delaySeconds(5)
-                .build();
-        sqs.sendMessage(send_msg_request);
-
-        try {
-            Thread.sleep(5000);
-            ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .build();
-            String fileLink = "";
-            while(true){
-                List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
-
-                    for (Message m : messages) {
-                        String body = m.body();
-                        if (body.contains("Done task")) {
-                            fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
-                        }
-                    }
-                    if(!fileLink.equals(""))
-                        break;
-                }
-            try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
-                 FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        catch(InterruptedException e){
-            System.out.println("got interrupted exception " + e.getMessage());
-        }
-
+        return sqs.getQueueUrl(getQueueRequest).queueUrl();
     }
+
     private static void createBucket(String bucket) {
         s3.createBucket(CreateBucketRequest
                 .builder()

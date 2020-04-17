@@ -15,16 +15,21 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Manager {
     private static S3Client s3;
     private static SqsClient sqs;
     private static final String appManagerQueue = "appManagerQueue";
+    private static final String managerAppQueue = "managerAppQueue";
     private static final String workerIQ = "M2W";
     private static final String workerOQ = "W2M";
 
 
     public static void main(String args[]) {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         Region region = Region.US_EAST_1;
         sqs = SqsClient.builder().region(region).build();
         s3 = S3Client.builder().region(region).build();
@@ -32,30 +37,15 @@ public class Manager {
                 .queueName(appManagerQueue)
                 .build();
         String appQueueUrl = sqs.getQueueUrl(getQueueRequest).queueUrl();
-        try {
-            CreateQueueRequest request = CreateQueueRequest.builder()
-                    .queueName(workerIQ)
-                    .build();
-            CreateQueueResponse create_result = sqs.createQueue(request);
-            CreateQueueRequest request2 = CreateQueueRequest.builder()
-                    .queueName(workerOQ)
-                    .build();
-            CreateQueueResponse create_result2 = sqs.createQueue(request2);
-
-        } catch (QueueNameExistsException e) {
-            throw e;
-        }
-        GetQueueUrlRequest getQueueRequest1 = GetQueueUrlRequest.builder()
-                .queueName(workerIQ)
+        getQueueRequest = GetQueueUrlRequest.builder()
+                .queueName(managerAppQueue)
                 .build();
-        GetQueueUrlRequest getQueueRequest2 = GetQueueUrlRequest.builder()
-                .queueName(workerOQ)
-                .build();
-        String workerIQUrl = sqs.getQueueUrl(getQueueRequest1).queueUrl();
-        String workerOQUrl = sqs.getQueueUrl(getQueueRequest2).queueUrl();
-
-
-        while (true) {
+        String toAppUrl = sqs.getQueueUrl((getQueueRequest)).queueUrl();
+        String workerIQUrl = createQueue(workerIQ);
+        String workerOQUrl = createQueue(workerOQ);
+        CleanQueues(workerIQUrl,workerOQUrl);
+        boolean terminate = false;
+        while (!terminate) {
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                     .queueUrl(appQueueUrl)
                     .build();
@@ -65,7 +55,6 @@ public class Manager {
             String key = "";
             String appId = "";
             int linesPerWorker = 0;
-            boolean terminate = false;
             for (Message m : messages) {
                 String body = m.body();
                 if (body.contains("New Task")) {
@@ -74,62 +63,81 @@ public class Manager {
                     key = split[2];
                     linesPerWorker = Integer.parseInt(split[3]);
                     appId = split[4];
-                    if(split.length>5){
-                        terminate=true;
+                    if (split.length > 5) {
+                        terminate = true;
                     }
+                    try {
+                        File input= new File("input" + appId + ".txt");
+                        if (!input.exists()) {
+                            input.createNewFile();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+                    try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
+                         FileOutputStream fileOutputStream = new FileOutputStream("input" + appId + ".txt")) {
+                        byte[] dataBuffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                            fileOutputStream.write(dataBuffer, 0, bytesRead);
+                        }
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key(key).build();
+                    s3.deleteObject(deleteObjectRequest);
 
-                fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
-                try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream("input" + appId + ".txt")) {
-                    byte[] dataBuffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    BufferedReader reader;
+                    int linesCounter = 0;
+                    try {
+                        reader = new BufferedReader(new FileReader("input" + appId + ".txt"));
+                        String line = reader.readLine();
+                        while (line != null) {
+                            linesCounter++;
+                            handleInputLine(workerIQUrl, line, appId);
+                            // read next line
+                            line = reader.readLine();
+                        }
+                        reader.close();
+                        File f = new File("input" + appId + ".txt");
+                        f.delete();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-                DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key(key).build();
-                s3.deleteObject(deleteObjectRequest);
-                BufferedReader reader;
-                int linesCounter = 0;
-                try {
-                    reader = new BufferedReader(new FileReader("input" + appId + ".txt"));
-                    String line = reader.readLine();
-                    while (line != null) {
-                        linesCounter++;
-                        handleInputLine(workerIQUrl, line, appId);
-                        // read next line
-                        line = reader.readLine();
-                    }
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
-                        .queueUrl(appQueueUrl)
-                        .receiptHandle(m.receiptHandle())
-                        .build();
-                sqs.deleteMessage(deleteRequest);
-                // Another thread handles this
-                handleWorkersOutput(linesCounter, workerOQUrl, appId, bucket, key, appQueueUrl);
-                try {
-                    Thread.sleep(5000);
-                }
-                    catch(InterruptedException e){
+                    DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                            .queueUrl(appQueueUrl)
+                            .receiptHandle(m.receiptHandle())
+                            .build();
+                    sqs.deleteMessage(deleteRequest);
+                    AppHandler handler = new AppHandler(linesCounter, workerOQUrl, appId, bucket, key, toAppUrl);
+                    executor.execute(handler);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
                         System.out.println("got interrupted exception " + e.getMessage());
                     }
-            }
-            if (terminate) {
-                //TODO wait for the other thread to finish working
-                break;
-            }
+
+                    if (terminate) {
+                        executor.shutdown();
+                        try {
+                            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                        } catch (InterruptedException e) {
+                            System.out.println("got interrupted exception " + e.getMessage());
+                        }
+                        terminate=true;
+                        break;
+                    }
+                }else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
-
-
     }
-
     private static void handleInputLine(String queue, String line, String appId) {
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(queue)
@@ -139,7 +147,7 @@ public class Manager {
         sqs.sendMessage(send_msg_request);
     }
 
-    private static void handleWorkersOutput(int counter, String queue, String appId, String bucket, String key, String appQueue) {
+    public static void handleWorkersOutput(int counter, String queue, String appId, String bucket, String key, String appQueue) {
         int lineCount = counter;
         String outputFile = "output" + appId + ".txt";
         while (lineCount != 0) {
@@ -161,7 +169,6 @@ public class Manager {
                                 .receiptHandle(m.receiptHandle())
                                 .build();
                         sqs.deleteMessage(deleteRequest);
-
                     }
                 }
             }
@@ -175,6 +182,8 @@ public class Manager {
                 .delaySeconds(5)
                 .build();
         sqs.sendMessage(send_msg_request);
+        File f = new File(outputFile);
+        f.delete();
     }
 
 
@@ -189,5 +198,25 @@ public class Manager {
         {
             System.err.println("IOException: " + ioe.getMessage());
         }
+    }
+
+    private static void CleanQueues(String queue1,String queue2) {
+        sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue1).build());
+        sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue2).build());
+    }
+
+    private static String createQueue(String queue) {
+        try {
+            CreateQueueRequest request = CreateQueueRequest.builder()
+                    .queueName(queue)
+                    .build();
+            sqs.createQueue(request);
+        } catch (QueueNameExistsException e) {
+            throw e;
+        }
+        GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
+                .queueName(queue)
+                .build();
+        return sqs.getQueueUrl(getQueueRequest).queueUrl();
     }
 }
