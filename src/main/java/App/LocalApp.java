@@ -32,7 +32,7 @@ public class LocalApp {
         sqs = SqsClient.builder().region(region).build();
         s3 = S3Client.builder().region(region).build();
         String linesPerWorker = "5";//args[3]
-        String outputName = "output.txt";//args [2]
+        String outputName = "output.html";//args [2]
         String inputFile = "file.txt"; // args[1]
         boolean terminate = false; //args[4]
         String queueNameOut = appManagerQueue;
@@ -65,19 +65,35 @@ public class LocalApp {
                 for (Message m : messages) {
                     String body = m.body();
                     if (body.contains("Done task")) {
-                        System.out.println("got done task");
+                        System.out.println("got done task, msg :"+body);
                         String[] split = body.split("#", 2);
                         if (split[1].equals(appId)) {
                             done = true;
                             System.out.println("done = true");
-                            fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
+                            fileLink = "https://" + bucket + ".s3.amazonaws.com/output" + appId+".html";
                             DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
                                     .queueUrl(queueInUrl)
                                     .receiptHandle(m.receiptHandle())
                                     .build();
                             sqs.deleteMessage(deleteRequest);
-                            if (!fileLink.equals(""))
+                            if (!fileLink.equals("")){
+                                try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
+
+                                     FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
+                                    byte[] dataBuffer = new byte[1024];
+                                    int bytesRead;
+                                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                                    }
+                                    sqs.deleteMessage(deleteRequest);
+                                    System.out.println("output link: "+fileLink);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 break;
+                            }
+
                             try {
                                 File output = new File(outputName);
                                 if (!output.exists()) {
@@ -86,18 +102,8 @@ public class LocalApp {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
 
-                                 FileOutputStream fileOutputStream = new FileOutputStream(outputName)) {
-                                byte[] dataBuffer = new byte[1024];
-                                int bytesRead;
-                                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                                }
-                                sqs.deleteMessage(deleteRequest);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+
 
                         }
                     }
