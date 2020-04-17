@@ -76,11 +76,6 @@ public class LocalApp {
                         System.out.println("got done task");
                         String[] split = body.split("#", 2);
                         if (split[1].equals(appId)) {
-                            DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
-                                    .queueUrl(queueUrl)
-                                    .receiptHandle(m.receiptHandle())
-                                    .build();
-                            sqs.deleteMessage(deleteRequest);
                             done = true;
                             System.out.println("done = true");
                             fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
