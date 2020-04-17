@@ -251,7 +251,7 @@ public class Worker {
         else if (res.equals("") && action.equals("ToText"))
             res = generateTEXTFromPDF(fileName, name, appId);
 
-        return action + '\t' + url + '\t' + res + '\n';
+        return action+":" + '\t' + url + '\t' + res + '\n';
 
     }
 
@@ -277,6 +277,6 @@ public class Worker {
     private static void removeFile (String fileName) {
         File f = new File(fileName);
         f.delete();
-        System.out.println("-- remove" + fileName + " complete --");
+        System.out.println("-- remove " + fileName + " complete --");
     }
 }

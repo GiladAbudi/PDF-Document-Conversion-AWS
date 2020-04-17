@@ -78,6 +78,7 @@ public class Manager {
                     key = split[2];
                     linesPerWorker = Integer.parseInt(split[3]);
                     appId = split[4];
+                    System.out.println("the msg is : new Task - with appId: "+appId);
                     if (split.length > 5) {
                         System.out.println("Manager received terminate");
                         terminate = true;
@@ -130,6 +131,7 @@ public class Manager {
                         }
 
                         reader.close();
+
                         File f = new File("input" + appId + ".txt");
                         f.delete();
                     } catch (IOException e) {
@@ -181,7 +183,7 @@ public class Manager {
 
     public static void handleWorkersOutput(int counter, String queue, String appId, String bucket, String key, String appQueue) {
         int lineCount = counter;
-        String outputFile = "output" + appId + ".txt";
+        String outputFile = "output" + appId + ".html";
         while (lineCount != 0) {
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                     .queueUrl(queue)
@@ -197,18 +199,21 @@ public class Manager {
                     if (currId.equals(appId)) {
                         writeLineToOutput(line, outputFile);
                         lineCount--;
+                        System.out.println("after counter -- , linecounter = : "+lineCount);
                         DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
                                 .queueUrl(queue)
                                 .receiptHandle(m.receiptHandle())
                                 .build();
                         sqs.deleteMessage(deleteRequest);
+                        System.out.println("delete request from queueURL : "+queue);
                     }
                 }
             }
         }
-        s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
+        s3.putObject(PutObjectRequest.builder().bucket(bucket).key(outputFile).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(outputFile)));
+        System.out.println("upload to S3  : "+outputFile);
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(appQueue)
                 .messageBody("Done task#" + appId)
@@ -217,15 +222,20 @@ public class Manager {
         sqs.sendMessage(send_msg_request);
         File f = new File(outputFile);
         f.delete();
+        System.out.println("delete outputFile : "+outputFile);
     }
 
 
     private static void writeLineToOutput(String line, String outputFile) {
-        try {
-            FileWriter fw = new FileWriter(outputFile, true); //the true will append the new data
-            fw.write(line);//appends the string to the file
+        try
+        {
+            FileWriter fw = new FileWriter(outputFile,true); //the true will append the new data
+            fw.write("<p>"+line+"</p>");
             fw.close();
-        } catch (IOException ioe) {
+            System.out.println("wirte line to out put- line : "+line+"\n");
+        }
+        catch(IOException ioe)
+        {
             System.err.println("IOException: " + ioe.getMessage());
         }
     }
@@ -233,6 +243,7 @@ public class Manager {
     private static void CleanQueues(String queue1, String queue2) {
         sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue1).build());
         sqs.purgeQueue(PurgeQueueRequest.builder().queueUrl(queue2).build());
+        System.out.println("clean queues\n");
     }
 
     private static String createQueue(String queue) {
