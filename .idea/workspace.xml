@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Dsp1:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/Dsp1_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/eilon.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/eilon.ppk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/output.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Actors/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dsp1Eilon.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/puttyDspKey.ppk" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Actors/Manager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Manager.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Actors/Worker.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Worker.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/App/LocalApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/App/LocalApp.class" afterDir="false" />
     </list>
@@ -34,14 +47,17 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="private" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/Actors" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="project.structure.side.proportion" value="0.20574713" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Application.LocalApp">
@@ -119,9 +135,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Worker" />
-        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.LocalApp" />
+        <item itemvalue="Application.Manager" />
+        <item itemvalue="Application.Worker" />
         <item itemvalue="Application.S3" />
         <item itemvalue="Application.EC2" />
       </list>
@@ -157,35 +173,42 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
   <component name="WindowStateProjectService">
     <state x="361" y="71" key="#Project_Structure" timestamp="1586768963018">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="361" y="71" key="#Project_Structure/0.0.1536.826@0.0.1536.826" timestamp="1586768963018" />
+    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1587201837700">
+      <screen x="0" y="0" width="1536" height="826" />
+    </state>
+    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.826@0.0.1536.826" timestamp="1587201837700" />
     <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog" timestamp="1586773441159">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog/0.0.1536.826@0.0.1536.826" timestamp="1586773441159" />
-    <state x="549" y="154" key="FileChooserDialogImpl" timestamp="1586769521559">
+    <state x="549" y="154" key="FileChooserDialogImpl" timestamp="1587201843028">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1586769521559" />
-    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587144440310">
+    <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1587201843028" />
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587212832283">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587144440310" />
-    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587144440310">
+    <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587212832283" />
+    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587212832283">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587144440310" />
-    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587144440310">
+    <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587212832283" />
+    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587212832283">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587144440310" />
-    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587144440310">
+    <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587212832283" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587212832283">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587144440310" />
+    <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587212832283" />
     <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1586946887151">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -202,10 +225,10 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state width="1492" height="256" key="GridCell.Tab.1.right/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
-    <state x="277" y="0" key="SettingsEditor" timestamp="1586945439498">
+    <state x="277" y="0" key="SettingsEditor" timestamp="1587201856522">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1586945439498" />
+    <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1587201856522" />
     <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1586795952188">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -223,19 +246,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>93</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/App/LocalApp.java</url>
-          <line>60</line>
+          <line>68</line>
           <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>65</line>
-          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

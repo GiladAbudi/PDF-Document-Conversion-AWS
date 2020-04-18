@@ -1,5 +1,6 @@
 package App;
 
+import Actors.Manager;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -25,13 +26,15 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static Actors.Manager.createQueue;
+
 
 public class LocalApp {
     private static S3Client s3;
     private static SqsClient sqs;
     private static final String appManagerQueue = "appManagerQueue";
     private static final String managerAppQueue = "managerAppQueue";
-    private static String bucket = "bucket1586960757978l";
+
     public static void main(String[] args) {
         Region region = Region.US_EAST_1;
         sqs = SqsClient.builder().region(region).build();
@@ -39,20 +42,23 @@ public class LocalApp {
         String linesPerWorker = "5";//args[3]
         String outputName = "output.html";//args [2]
         String inputFile = "file.txt"; // args[1]
-        boolean terminate = false; //args[4]
-        String queueNameOut = appManagerQueue;
-        String queueNameIn = managerAppQueue;
+        boolean terminate = true; //args[4]
         String appId = ""+ System.currentTimeMillis();
         String key = appId+inputFile;
+        String bucket = "bucket1586960757978l";
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));
 
-        String queueOutUrl = createQueue(queueNameOut);
-        String queueInUrl = createQueue(queueNameIn);
+        String queueOutUrl = createQueue(appManagerQueue,sqs);
+        String queueInUrl = createQueue(managerAppQueue,sqs);
+        String toTerminate = "";
+        if(terminate) {
+            toTerminate = "#true";
+        }
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(queueOutUrl)
-                .messageBody("New Task#" + bucket + "#" + key + "#" + linesPerWorker + "#" + appId)
+                .messageBody("New Task#" + bucket + "#" + key + "#" + linesPerWorker + "#" + appId + toTerminate)
                 .delaySeconds(5)
                 .build();
         boolean done = false;
@@ -119,27 +125,14 @@ public class LocalApp {
         }
     }
 
-    private static String createQueue(String queue) {
-        try {
-            CreateQueueRequest request = CreateQueueRequest.builder()
-                    .queueName(queue)
-                    .build();
-            sqs.createQueue(request);
-        } catch (QueueNameExistsException e) {
-            throw e;
-        }
-        GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
-                .queueName(queue)
-                .build();
-        return sqs.getQueueUrl(getQueueRequest).queueUrl();
-    }
 
-    private static void createBucket(String bucket) {
-        s3.createBucket(CreateBucketRequest
-                .builder()
-                .bucket(bucket)
-                .build());
-    }
+
+//    private static void createBucket(String bucket) {
+//        s3.createBucket(CreateBucketRequest
+//                .builder()
+//                .bucket(bucket)
+//                .build());
+//    }
 
 //    public static String Init_Script_Manager() {
 //        return "#!/bin/bash\n" +
@@ -148,27 +141,15 @@ public class LocalApp {
 //                "java -jar manager.jar &> log.txt\n";
 //    }
 
-    private static String getUserDataScript(){
+    private static String getManagerDataScript(){
         ArrayList<String> lines = new ArrayList<>();
         lines.add("#! /bin/bash");
         lines.add("sudo apt-get update");
         lines.add("sudo apt-get install wget -y");
         lines.add("sudo wget url");
         lines.add("java -jar manager.jar");
-        return new String(Base64.getEncoder().encode(join(lines, "\n").getBytes()));
+        return new String(Base64.getEncoder().encode(Manager.join(lines, "\n").getBytes()));
     }
 
-    private static String join(Collection<String> s, String delimiter) {
-        StringBuilder builder = new StringBuilder();
-        Iterator<String> iter = s.iterator();
-        while (iter.hasNext()) {
-            builder.append(iter.next());
-            if (!iter.hasNext()) {
-                break;
-            }
-            builder.append(delimiter);
-        }
-        return builder.toString();
-    }
 
 }

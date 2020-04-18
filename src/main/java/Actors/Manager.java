@@ -1,18 +1,14 @@
 package Actors;
 
 import software.amazon.awssdk.services.ec2.Ec2Client;
-import software.amazon.awssdk.services.ec2.model.InstanceType;
-import software.amazon.awssdk.services.ec2.model.RunInstancesRequest;
-import software.amazon.awssdk.services.ec2.model.RunInstancesResponse;
-import software.amazon.awssdk.services.ec2.model.Tag;
-import software.amazon.awssdk.services.ec2.model.CreateTagsRequest;
-import software.amazon.awssdk.services.ec2.model.Ec2Exception;
+import software.amazon.awssdk.services.ec2.model.*;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 import software.amazon.awssdk.services.ec2.model.RunInstancesRequest;
+import software.amazon.awssdk.services.iam.model.AddRoleToInstanceProfileRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -28,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Manager {
     private static S3Client s3;
@@ -38,14 +33,17 @@ public class Manager {
     private static final String managerAppQueue = "managerAppQueue";
     private static final String workerIQ = "M2W";
     private static final String workerOQ = "W2M";
+    private static final String workerJar = "https://appbucket305336117.s3.amazonaws.com/worker.jar";
+    private static final String workerAmi = "ami-076515f20540e6e0b";
+    private static int workerInstances;
 
     public static void main(String args[]) {
-        ec2 = Ec2Client.create();
-        int workerInstances = 0;
+        workerInstances=0;
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
         Region region = Region.US_EAST_1;
         sqs = SqsClient.builder().region(region).build();
         s3 = S3Client.builder().region(region).build();
+        ec2 = Ec2Client.builder().region(region).build();
         GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
                 .queueName(appManagerQueue)
                 .build();
@@ -54,8 +52,8 @@ public class Manager {
                 .queueName(managerAppQueue)
                 .build();
         String toAppUrl = sqs.getQueueUrl((getQueueRequest)).queueUrl();
-        String workerIQUrl = createQueue(workerIQ);
-        String workerOQUrl = createQueue(workerOQ);
+        String workerIQUrl = createQueue(workerIQ,sqs);
+        String workerOQUrl = createQueue(workerOQ,sqs);
         CleanQueues(workerIQUrl, workerOQUrl);
         System.out.println("Manager: created and cleaned queues");
         boolean terminate = false;
@@ -151,12 +149,14 @@ public class Manager {
                     }
 
                     if (terminate) {
+                        System.out.println("manager received terminate from local app, terminating");
                         executor.shutdown();
                         try {
                             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
                         } catch (InterruptedException e) {
                             System.out.println("got interrupted exception " + e.getMessage());
                         }
+                        closeWorkersInstances();
                         terminate = true;
                         break;
                     }
@@ -169,6 +169,34 @@ public class Manager {
                 }
             }
             //TODO - check if all instances are alive
+        }
+    }
+
+    private static void closeWorkersInstances() {
+        // snippet-start:[ec2.java2.describe_instances.main]
+        String nextToken = null;
+        Filter filter = Filter.builder()
+                .name("instance-state-name")
+                .values("running")
+                .build();
+        try {
+            do {
+                DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
+                DescribeInstancesResponse response = ec2.describeInstances(request);
+
+                for (Reservation reservation : response.reservations()) {
+                    for (Instance instance : reservation.instances()) {
+                       if (instance.imageId().equals(workerAmi)){
+                           TerminateInstancesRequest req = TerminateInstancesRequest.builder().instanceIds(instance.instanceId()).build();
+                           TerminateInstancesResponse res = ec2.terminateInstances(req);
+                       }
+                    }
+                }
+                nextToken = response.nextToken();
+            } while (nextToken != null);
+
+        } catch (Ec2Exception e) {
+            e.getStackTrace();
         }
     }
 
@@ -246,7 +274,7 @@ public class Manager {
         System.out.println("clean queues\n");
     }
 
-    private static String createQueue(String queue) {
+    public static String createQueue(String queue,SqsClient sqs) {
         try {
             CreateQueueRequest request = CreateQueueRequest.builder()
                     .queueName(queue)
@@ -266,13 +294,13 @@ public class Manager {
         lines.add("#! /bin/bash");
         lines.add("cd home/ec2-user/");
 //        lines.add("sudo apt-get install openjdk-8-jre-headless -y");
-        lines.add("wget " + workerJar + " -O manager.jar");
+        lines.add("wget " + workerJar + " -O worker.jar");
         lines.add("java -jar worker.jar &> log.txt");
         return new String(Base64.getEncoder().encode(join(lines, "\n").getBytes()));
 
     }
 
-    private static String join(Collection<String> s, String delimiter) {
+    public static String join(Collection<String> s, String delimiter) {
         StringBuilder builder = new StringBuilder();
         Iterator<String> iter = s.iterator();
         while (iter.hasNext()) {
@@ -285,15 +313,18 @@ public class Manager {
         return builder.toString();
     }
 
-    private static void createWorkers(int numberOfWorkersToCreate) {
+    public static void createWorkers(int numberOfWorkersToCreate) {
         System.out.println("Manager: creating "+ numberOfWorkersToCreate + "worker ec2 instances");
         try {
             for (int i = 0; i < numberOfWorkersToCreate; i++) {
+                workerInstances++;
                 RunInstancesRequest runRequest = RunInstancesRequest.builder()
-                        .imageId("ami-076515f20540e6e0b")
+                        .imageId(workerAmi)
                         .instanceType(InstanceType.T2_MICRO)
                         .maxCount(1)
                         .minCount(1)
+                        .iamInstanceProfile(IamInstanceProfileSpecification.builder().arn("arn:aws:iam::577569430471:instance-profile/workerRole").build())
+                        .securityGroups("eilon")
                         .userData(getWorkerData())
                         .build();
                 RunInstancesResponse response = ec2.runInstances(runRequest);
@@ -308,6 +339,7 @@ public class Manager {
                         .tags(tag)
                         .build();
                 ec2.createTags(tagRequest);
+
             }
         } catch (Ec2Exception e) {
             System.err.println(e.getMessage());
