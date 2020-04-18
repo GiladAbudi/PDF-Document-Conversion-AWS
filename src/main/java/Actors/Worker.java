@@ -1,5 +1,7 @@
 package Actors;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.io.RandomAccessFile;
 import org.apache.pdfbox.pdfparser.PDFParser;
@@ -28,6 +30,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Worker {
     private static S3Client s3;
@@ -69,8 +72,7 @@ public class Worker {
 
         ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrlM2W)
-                .maxNumberOfMessages(3)
-                .visibilityTimeout(120)
+                .visibilityTimeout(120) // in sec
                 .build();
 
 
@@ -94,7 +96,6 @@ public class Worker {
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     private static void createBucket(String bucket) {
         s3.createBucket(CreateBucketRequest
@@ -242,8 +243,19 @@ public class Worker {
         String[] slashParse = url.split("/");
         String fileName = "output/" + slashParse[slashParse.length - 1];      // output/___.pdf
         String name = fileName.split("\\.")[0];                    // output/___
-
-        res = downloadPDF(url, fileName);     //download the pdf
+        try {
+            TimeLimiter limiter = new SimpleTimeLimiter();
+            res = limiter.callWithTimeout(()-> {
+                {
+                    return downloadPDF(url, fileName);  //download the pdf
+                }
+            }, 60, TimeUnit.SECONDS, true);
+        }catch (Exception e){
+            removeFile(fileName +".pdf");
+            System.out.println(" ------ time out Exp !!!!!!");
+            return action+":" + '\t' + url + '\t' + "cant-download-pdfFile" + '\n';
+        }
+       // res = downloadPDF(url, fileName);
         if (res.equals("") && action.equals("ToImage"))
             res = generatePNGFromPDF(fileName, name, appId);
         else if (res.equals("") && action.equals("ToHTML"))
