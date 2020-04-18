@@ -44,7 +44,6 @@ public class Worker {
 
         SqsClient sqs = SqsClient.builder().region(Region.US_EAST_1).build();
         bucket = "bucket1586960757978w";//"bucket" + System.currentTimeMillis();
-
         //s3 instance
         s3 = S3Client.builder().region(Region.US_EAST_1).build();
         //createBucket(bucket);
@@ -254,7 +253,7 @@ public class Worker {
         String action = pharseline[0];
         String url = pharseline[1];
         String[] slashParse = url.split("/");
-        String fileName = "output/" + slashParse[slashParse.length - 1];      // output/___.pdf
+        String fileName = slashParse[slashParse.length - 1];      // output/___.pdf
         String name = fileName.split("\\.")[0];                    // output/___
         try {
             TimeLimiter limiter = new SimpleTimeLimiter();

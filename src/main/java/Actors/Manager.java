@@ -1,26 +1,38 @@
+//String linesPerWorker = args[2];
+////        try{
+////            Integer.parseInt(linesPerWorker);
+////        }catch(Exception e){
+////            System.out.println("bad argument for n");
+////            System.exit(-1);
+////        }
+////        String outputName = args[1];//args [2]
+////        String inputFile = args[0]; // args[1]
+////        boolean terminate = false; //args[4]
+////        if(args[args.length-1].equals("terminate")){
+////            terminate=true;
+////        }
+//        if(args.length!=3 &&args.length!=4){
+//        System.out.println("invalid num of arguments");
+//        System.exit(-1);
+//        }
 package Actors;
-
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.*;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.InstanceType;
 import software.amazon.awssdk.services.ec2.model.RunInstancesRequest;
-import software.amazon.awssdk.services.iam.model.AddRoleToInstanceProfileRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -37,12 +49,17 @@ public class Manager {
     private static final String workerAmi = "ami-076515f20540e6e0b";
     private static int workerInstances;
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
+        System.out.println("Started manager");
         workerInstances=0;
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        System.out.println("Creating thread pool");
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         Region region = Region.US_EAST_1;
+        System.out.println("Creating sqs client");
         sqs = SqsClient.builder().region(region).build();
+        System.out.println("Creating s3 client");
         s3 = S3Client.builder().region(region).build();
+        System.out.println("Creating ec2 client");
         ec2 = Ec2Client.builder().region(region).build();
         GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
                 .queueName(appManagerQueue)
@@ -52,7 +69,9 @@ public class Manager {
                 .queueName(managerAppQueue)
                 .build();
         String toAppUrl = sqs.getQueueUrl((getQueueRequest)).queueUrl();
+        System.out.println("creating first queue");
         String workerIQUrl = createQueue(workerIQ,sqs);
+        System.out.println("creating second queue");
         String workerOQUrl = createQueue(workerOQ,sqs);
         CleanQueues(workerIQUrl, workerOQUrl);
         System.out.println("Manager: created and cleaned queues");
@@ -88,6 +107,7 @@ public class Manager {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
                     fileLink = "https://" + bucket + ".s3.amazonaws.com/" + key;
                     try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
@@ -102,9 +122,9 @@ public class Manager {
                     }
                     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key(key).build();
                     s3.deleteObject(deleteObjectRequest);
-
                     BufferedReader reader;
                     int linesCounter = 0;
+
                     try {
                         reader = new BufferedReader(new FileReader("input" + appId + ".txt"));
                         String line = reader.readLine();
@@ -115,25 +135,25 @@ public class Manager {
                             // read next line
                             line = reader.readLine();
                         }
-                        if (!(workerInstances > 19)) {
+                        if (!(workerInstances > 18)) {
                             int workersToCreate = linesCounter / linesPerWorker;
                             if (!(workersToCreate < workerInstances)) {
-                                if (workersToCreate + workerInstances > 19) {
-                                    createWorkers(19 - workerInstances);
-                                } else if (workersToCreate == 0) {
+                                if (workersToCreate + workerInstances > 18) {
+                                    createWorkers(18 - workerInstances);
+                                } else if (workersToCreate == 0 && workerInstances == 0) {
                                     createWorkers(1);
                                 } else {
-                                    createWorkers(workersToCreate);
+                                    createWorkers(workersToCreate-workerInstances);
                                 }
                             }
                         }
-
                         reader.close();
-
                         File f = new File("input" + appId + ".txt");
                         f.delete();
+                        waitForWorkersToStart();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        System.out.println("Got Exception while reading input file" + e.getMessage());
                     }
                     DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
                             .queueUrl(appQueueUrl)
@@ -156,7 +176,7 @@ public class Manager {
                         } catch (InterruptedException e) {
                             System.out.println("got interrupted exception " + e.getMessage());
                         }
-                        closeWorkersInstances();
+                        closeInstances("Worker");
                         terminate = true;
                         break;
                     }
@@ -164,15 +184,35 @@ public class Manager {
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
+                        System.out.println("got interrupted exception " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
             }
             //TODO - check if all instances are alive
         }
+        closeInstances("Manager");
     }
 
-    private static void closeWorkersInstances() {
+    private static void waitForWorkersToStart(){
+        String nextToken = null;
+        Filter filter = Filter.builder()
+                .name("instance-state-name")
+                .values("pending")
+                .build();
+        try {
+            do {
+                DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
+                DescribeInstancesResponse response = ec2.describeInstances(request);
+                nextToken = response.nextToken();
+            } while (nextToken != null);
+
+        } catch (Ec2Exception e) {
+            System.out.println("got exception while waiting for workers to start " + e.getMessage());
+            e.getStackTrace();
+        }
+    }
+    private static void closeInstances(String role) {
         // snippet-start:[ec2.java2.describe_instances.main]
         String nextToken = null;
         Filter filter = Filter.builder()
@@ -183,19 +223,22 @@ public class Manager {
             do {
                 DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
                 DescribeInstancesResponse response = ec2.describeInstances(request);
-
                 for (Reservation reservation : response.reservations()) {
                     for (Instance instance : reservation.instances()) {
-                       if (instance.imageId().equals(workerAmi)){
-                           TerminateInstancesRequest req = TerminateInstancesRequest.builder().instanceIds(instance.instanceId()).build();
-                           TerminateInstancesResponse res = ec2.terminateInstances(req);
-                       }
+                        List<Tag> tags = instance.tags();
+                        for(Tag tag : tags) {
+                            if (tag.value().equals(role)) {
+                                TerminateInstancesRequest req = TerminateInstancesRequest.builder().instanceIds(instance.instanceId()).build();
+                                TerminateInstancesResponse res = ec2.terminateInstances(req);
+                            }
+                        }
                     }
                 }
                 nextToken = response.nextToken();
             } while (nextToken != null);
 
         } catch (Ec2Exception e) {
+            System.out.println("got exception while closing worker instances " + e.getMessage());
             e.getStackTrace();
         }
     }
@@ -281,6 +324,7 @@ public class Manager {
                     .build();
             sqs.createQueue(request);
         } catch (QueueNameExistsException e) {
+            System.out.println("received queue exists exception");
             throw e;
         }
         GetQueueUrlRequest getQueueRequest = GetQueueUrlRequest.builder()
@@ -293,7 +337,6 @@ public class Manager {
         ArrayList<String> lines = new ArrayList<>();
         lines.add("#! /bin/bash");
         lines.add("cd home/ec2-user/");
-//        lines.add("sudo apt-get install openjdk-8-jre-headless -y");
         lines.add("wget " + workerJar + " -O worker.jar");
         lines.add("java -jar worker.jar &> log.txt");
         return new String(Base64.getEncoder().encode(join(lines, "\n").getBytes()));
@@ -314,7 +357,10 @@ public class Manager {
     }
 
     public static void createWorkers(int numberOfWorkersToCreate) {
-        System.out.println("Manager: creating "+ numberOfWorkersToCreate + "worker ec2 instances");
+        System.out.println("Manager: creating "+ numberOfWorkersToCreate + " worker ec2 instances");
+        if(numberOfWorkersToCreate<=0){
+            return;
+        }
         try {
             for (int i = 0; i < numberOfWorkersToCreate; i++) {
                 workerInstances++;
@@ -325,13 +371,14 @@ public class Manager {
                         .minCount(1)
                         .iamInstanceProfile(IamInstanceProfileSpecification.builder().arn("arn:aws:iam::577569430471:instance-profile/workerRole").build())
                         .securityGroups("eilon")
+                        .keyName("eilon")
                         .userData(getWorkerData())
                         .build();
                 RunInstancesResponse response = ec2.runInstances(runRequest);
                 String instanceId = response.instances().get(0).instanceId();
                 Tag tag = Tag.builder()
                         .key("role")
-                        .value("worker")
+                        .value("Worker")
                         .build();
 
                 CreateTagsRequest tagRequest = CreateTagsRequest.builder()
@@ -342,7 +389,7 @@ public class Manager {
 
             }
         } catch (Ec2Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println("Ec2 exception : " + e.getMessage());
             System.exit(1);
         }
     }
