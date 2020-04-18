@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.io.RandomAccessFile;
+import org.apache.pdfbox.io.RandomAccessRead;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -72,7 +73,7 @@ public class Worker {
 
         ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrlM2W)
-                .visibilityTimeout(120) // in sec
+                .visibilityTimeout(180) // in sec
                 .build();
 
 
@@ -128,22 +129,22 @@ public class Worker {
         try {
             pd = PDDocument.load(new File(filename));
         } catch (IOException e) {
-            removeFile(outputFileName +".pdf");
+            removeFile(filename);
             return "cant-load-PDF";
         }
 
         PDFRenderer pr = new PDFRenderer(fisrtPageOfPDFfile(pd));
-        BufferedImage bi = pr.renderImageWithDPI(0, 300);
+        BufferedImage bi = pr.renderImageWithDPI(0, 100);
         ImageIO.write(bi, "PNG", new File(outputFileName + ".png"));
         pd.close();
         try {
             uploadFileToS3(outputFileName, appId,  ".png");
         } catch (Exception e) {
-            removeFile(outputFileName +".pdf");
+            removeFile(filename);
             removeFile(outputFileName +".png");
             return "cantUploadFile";
         }
-        removeFile(outputFileName +".pdf");
+        removeFile(filename);
         removeFile(outputFileName +".png");
         System.out.println("WORK PNG");
         return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".png";
@@ -167,37 +168,49 @@ public class Worker {
             new PDFDomTree().writeText(pdf1, output);
             uploadFileToS3(outputFileName, appId,  ".html");
         } catch (ParserConfigurationException e) {
-            removeFile(outputFileName +".pdf");
+            removeFile(filename);
             return "cant-generateHTML";
         } catch (Exception e) {
-            removeFile(outputFileName +".pdf");
+            removeFile(filename);
             return "cantUploadFile";
         }
         pdf.close();
         pdf1.close();
         output.close();
         removeFile(outputFileName +".html");
-        removeFile(outputFileName +".pdf");
+        removeFile(filename);
         System.out.println("WORK HTML");
         return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".html";
     }
 
     private static String generateTEXTFromPDF(String filename, String outputFileName, String appId) throws IOException {
-        File f = new File(filename);
+
         String parsedText;
-        PDFParser parser = new PDFParser(new RandomAccessFile(f, "r"));
-        try {
-            parser.parse();
+       try {
+           File f = new File(filename);
+           PDDocument docf = PDDocument.load(f);
+           docf.close();
+           PDDocument doc= fisrtPageOfPDFfile(docf);
+           parsedText=new PDFTextStripper().getText(doc);
+           doc.close();
+       }catch (IOException e){
+           removeFile(filename); // remove pdf file
+           return "cant-access-to-file";
+       }
+
+        try(FileWriter fw = new FileWriter(outputFileName + ".txt", true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        PrintWriter out = new PrintWriter(bw))
+        {
+            out.println(parsedText);
+
         } catch (IOException e) {
-            removeFile(outputFileName +".pdf");
+            removeFile(outputFileName +".txt");
+            removeFile(filename);
             return "cant-parse-to-text";
         }
-        COSDocument cosDoc = parser.getDocument();
-        PDFTextStripper pdfStripper = new PDFTextStripper();
-        PDDocument pdDoc = new PDDocument(cosDoc);
-        parsedText = pdfStripper.getText(fisrtPageOfPDFfile(pdDoc));
-        PrintWriter pw = new PrintWriter(outputFileName + ".txt");
-        pw.print(parsedText);
+
+
         //upload the file to S3
         try {
             uploadFileToS3(outputFileName, appId, ".txt");
@@ -206,10 +219,9 @@ public class Worker {
             removeFile(outputFileName +".pdf");
             return "cantUploadFile";
         }
-        pdDoc.close();
-        pw.close();
+
         removeFile(outputFileName +".txt");
-        removeFile(outputFileName +".pdf");
+        removeFile(filename);
         System.out.println("WORK TEXT");
         return "https://" + bucket + ".s3.amazonaws.com/" + appId+outputFileName + ".txt";
     }
@@ -221,8 +233,9 @@ public class Worker {
         try {
             in = url.openStream();
             Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
+            in.close();
         } catch (IOException e) {
-            removeFile(fileName +".pdf");
+            removeFile(fileName);
             return "cant-access-to-file";
         }
         System.out.println("WORK download");
@@ -286,6 +299,7 @@ public class Worker {
     }
 
     private static void removeFile (String fileName) {
+
         File f = new File(fileName);
         f.delete();
         System.out.println("-- remove " + fileName + " complete --");
