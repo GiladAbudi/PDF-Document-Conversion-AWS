@@ -42,12 +42,14 @@ public class LocalApp {
         s3 = S3Client.builder().region(region).build();
         String linesPerWorker = "1";//args[3]
         String outputName = "output.html";//args [2]
-        String inputFile = "file.txt"; // args[1]
+        String inputFile = "input-sample-1.txt"; // args[1]
         boolean terminate = true; //args[4]
         String appId = ""+ System.currentTimeMillis();
         String key = appId+inputFile;
         String bucket = "bucket1586960757978l";
-        startManager();
+//        if(!isRunning("Manager")){
+//            createManager();
+//        }
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));
@@ -124,45 +126,38 @@ public class LocalApp {
         }
     }
 
-    private static void startManager(){
-        System.out.println("LocalApp checking if manager exists");
-
-        boolean found=false;
+    private static boolean isRunning(String role){
+        System.out.println("Checking if there are runnning or pending " +role+ " instances");
         String nextToken = null;
         try {
             do {
-                Filter filter = Filter.builder()
-                        .name("instance-state-name")
-                        .values("running")
-                        .build();
-                DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
+                DescribeInstancesRequest request = DescribeInstancesRequest.builder().maxResults(6).nextToken(nextToken).build();
                 DescribeInstancesResponse response = ec2.describeInstances(request);
                 for (Reservation reservation : response.reservations()) {
                     for (Instance instance : reservation.instances()) {
                         List<Tag> tags = instance.tags();
-                        for(Tag tag : tags){
-                            if(tag.value().equals("Manager")){
-                                found=true;
-                                break;
+                        if (tags != null) {
+                            for (Tag tag : tags) {
+                                if (tag.value().equals(role) && (instance.state().name().toString().equals("running") || instance.state().name().toString().equals("pending"))) {
+                                    return true;
+                                }
                             }
                         }
                     }
                 }
                 nextToken = response.nextToken();
             } while (nextToken != null);
-        if(!found){
-            createManager();
-        }
         } catch (Ec2Exception e) {
             e.getStackTrace();
         }
+        return false;
     }
 
     private static void createManager() {
         try {
             RunInstancesRequest runRequest = RunInstancesRequest.builder()
                     .imageId(managerAmi)
-                    .instanceType(InstanceType.T2_MICRO)
+                    .instanceType(InstanceType.T2_SMALL)
                     .maxCount(1)
                     .minCount(1)
                     .iamInstanceProfile(IamInstanceProfileSpecification.builder().arn("arn:aws:iam::577569430471:instance-profile/managerRole").build())
@@ -191,7 +186,7 @@ public class LocalApp {
         lines.add("#! /bin/bash");
         lines.add("cd home/ec2-user/");
         lines.add("wget " + managerJar + " -O manager.jar");
-        lines.add("java -jar manager.jar &> log.txt");
+        lines.add("java -Xmx30g -jar manager.jar &> log.txt");
         return new String(Base64.getEncoder().encode(Manager.join(lines, "\n").getBytes()));
     }
 }

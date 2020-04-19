@@ -16,6 +16,7 @@
 //        System.exit(-1);
 //        }
 package Actors;
+
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.*;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -28,6 +29,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -51,7 +53,7 @@ public class Manager {
 
     public static void main(String[] args) {
         System.out.println("Started manager");
-        workerInstances=0;
+        workerInstances = 0;
         System.out.println("Creating thread pool");
         ExecutorService executor = Executors.newFixedThreadPool(10);
         Region region = Region.US_EAST_1;
@@ -70,9 +72,9 @@ public class Manager {
                 .build();
         String toAppUrl = sqs.getQueueUrl((getQueueRequest)).queueUrl();
         System.out.println("creating first queue");
-        String workerIQUrl = createQueue(workerIQ,sqs);
+        String workerIQUrl = createQueue(workerIQ, sqs);
         System.out.println("creating second queue");
-        String workerOQUrl = createQueue(workerOQ,sqs);
+        String workerOQUrl = createQueue(workerOQ, sqs);
         CleanQueues(workerIQUrl, workerOQUrl);
         System.out.println("Manager: created and cleaned queues");
         boolean terminate = false;
@@ -95,7 +97,7 @@ public class Manager {
                     key = split[2];
                     linesPerWorker = Integer.parseInt(split[3]);
                     appId = split[4];
-                    System.out.println("the msg is : new Task - with appId: "+appId);
+                    System.out.println("the msg is : new Task - with appId: " + appId);
                     if (split.length > 5) {
                         System.out.println("Manager received terminate");
                         terminate = true;
@@ -130,26 +132,27 @@ public class Manager {
                         String line = reader.readLine();
                         while (line != null) {
                             linesCounter++;
-                            handleInputLine(workerIQUrl, line, appId);
-                            System.out.println("Manager: sent line " +line +"to workers");
                             // read next line
                             line = reader.readLine();
                         }
-                        if (!(workerInstances > 18)) {
+                        LineHandler handler = new LineHandler(workerIQUrl,appId,"input" + appId + ".txt");
+                        executor.execute(handler);
+                        if (!(workerInstances > 7)) {
                             int workersToCreate = linesCounter / linesPerWorker;
+                            System.out.println(workersToCreate + "Workers needed by app. current number of workers running: " +workerInstances);
                             if (!(workersToCreate < workerInstances)) {
-                                if (workersToCreate + workerInstances > 18) {
-                                    createWorkers(18 - workerInstances);
+                                if (workersToCreate + workerInstances > 7) {
+                                    createWorkers(8 - workerInstances);
                                 } else if (workersToCreate == 0 && workerInstances == 0) {
                                     createWorkers(1);
                                 } else {
-                                    createWorkers(workersToCreate-workerInstances);
+                                    createWorkers(workersToCreate - workerInstances);
                                 }
                             }
                         }
-                        reader.close();
-                        File f = new File("input" + appId + ".txt");
-                        f.delete();
+//                        reader.close();
+//                        File f = new File("input" + appId + ".txt");
+//                        f.delete();
                         waitForWorkersToStart();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -194,56 +197,71 @@ public class Manager {
         closeInstances("Manager");
     }
 
-    private static void waitForWorkersToStart(){
+    private static void waitForWorkersToStart() {
+        System.out.println("waiting for workers to start");
         String nextToken = null;
-        Filter filter = Filter.builder()
-                .name("instance-state-name")
-                .values("pending")
-                .build();
-        try {
-            do {
-                DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
-                DescribeInstancesResponse response = ec2.describeInstances(request);
-                nextToken = response.nextToken();
-            } while (nextToken != null);
+        boolean found = true;
+        while (found) {
+            found = false;
+            try {
+                do {
+                    DescribeInstancesRequest request = DescribeInstancesRequest.builder().maxResults(6).nextToken(nextToken).build();
+                    DescribeInstancesResponse response = ec2.describeInstances(request);
+                    for (Reservation reservation : response.reservations()) {
+                        for (Instance instance : reservation.instances()) {
+                            List<Tag> tags = instance.tags();
+                            if (tags != null) {
+                                for (Tag tag : tags) {
+                                    if (tag.value().equals("Worker") && instance.state().name().toString().equals("pending")) {
+                                        found = true;
+                                    }
 
-        } catch (Ec2Exception e) {
-            System.out.println("got exception while waiting for workers to start " + e.getMessage());
-            e.getStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    nextToken = response.nextToken();
+                }
+                while (nextToken != null);
+
+            } catch (Ec2Exception e) {
+                System.out.println("got exception while waiting for workers to start " + e.getMessage());
+                e.getStackTrace();
+            }
         }
     }
+
     private static void closeInstances(String role) {
+        System.out.println("closing instances of " +role);
         // snippet-start:[ec2.java2.describe_instances.main]
         String nextToken = null;
-        Filter filter = Filter.builder()
-                .name("instance-state-name")
-                .values("running")
-                .build();
         try {
             do {
-                DescribeInstancesRequest request = DescribeInstancesRequest.builder().filters(filter).build();
+                DescribeInstancesRequest request = DescribeInstancesRequest.builder().maxResults(6).nextToken(nextToken).build();
                 DescribeInstancesResponse response = ec2.describeInstances(request);
                 for (Reservation reservation : response.reservations()) {
                     for (Instance instance : reservation.instances()) {
                         List<Tag> tags = instance.tags();
-                        for(Tag tag : tags) {
-                            if (tag.value().equals(role)) {
-                                TerminateInstancesRequest req = TerminateInstancesRequest.builder().instanceIds(instance.instanceId()).build();
-                                TerminateInstancesResponse res = ec2.terminateInstances(req);
+                        if (tags != null) {
+                            for (Tag tag : tags) {
+                                if (tag.value().equals(role) && (instance.state().name().toString().equals("running") || instance.state().name().toString().equals("pending"))) {
+                                    TerminateInstancesRequest req = TerminateInstancesRequest.builder().instanceIds(instance.instanceId()).build();
+                                    TerminateInstancesResponse res = ec2.terminateInstances(req);
+                                }
                             }
                         }
                     }
                 }
                 nextToken = response.nextToken();
             } while (nextToken != null);
-
-        } catch (Ec2Exception e) {
+        } catch (
+                Ec2Exception e) {
             System.out.println("got exception while closing worker instances " + e.getMessage());
             e.getStackTrace();
         }
     }
 
-    private static void handleInputLine(String queue, String line, String appId) {
+    public static void handleInputLine(String queue, String line, String appId) {
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(queue)
                 .messageBody(appId + "#" + line)
@@ -256,35 +274,40 @@ public class Manager {
         int lineCount = counter;
         String outputFile = "output" + appId + ".html";
         while (lineCount != 0) {
-            ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
-                    .queueUrl(queue)
-                    .build();
-            List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
-            for (Message m : messages) {
-                String body = m.body();
-                if (body.contains("PDF task done")) {
-                    System.out.println("Manager: received pdf task done message: " + body);
-                    String[] split = body.split("#", 3);
-                    String line = split[2];
-                    String currId = split[1];
-                    if (currId.equals(appId)) {
-                        writeLineToOutput(line, outputFile);
-                        lineCount--;
-                        System.out.println("after counter -- , linecounter = : "+lineCount);
-                        DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
-                                .queueUrl(queue)
-                                .receiptHandle(m.receiptHandle())
-                                .build();
-                        sqs.deleteMessage(deleteRequest);
-                        System.out.println("delete request from queueURL : "+queue);
+            try {
+                ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
+                        .queueUrl(queue)
+                        .build();
+                List<Message> messages = sqs.receiveMessage(receiveRequest).messages();
+                for (Message m : messages) {
+                    String body = m.body();
+                    if (body.contains("PDF task done")) {
+                        System.out.println("Manager: received pdf task done message: " + body);
+                        String[] split = body.split("#", 3);
+                        String line = split[2];
+                        String currId = split[1];
+                        if (currId.equals(appId)) {
+                            writeLineToOutput(line, outputFile);
+                            lineCount--;
+                            System.out.println("after counter -- , linecounter = : " + lineCount);
+                            DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+                                    .queueUrl(queue)
+                                    .receiptHandle(m.receiptHandle())
+                                    .build();
+                            sqs.deleteMessage(deleteRequest);
+                            System.out.println("delete request from queueURL : " + queue);
+                        }
                     }
                 }
+            }
+            catch(Ec2Exception e){
+                System.out.println("receieved Ec2Exception: " +e.getMessage());
             }
         }
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(outputFile).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(outputFile)));
-        System.out.println("upload to S3  : "+outputFile);
+        System.out.println("upload to S3  : " + outputFile);
         SendMessageRequest send_msg_request = SendMessageRequest.builder()
                 .queueUrl(appQueue)
                 .messageBody("Done task#" + appId)
@@ -293,20 +316,17 @@ public class Manager {
         sqs.sendMessage(send_msg_request);
         File f = new File(outputFile);
         f.delete();
-        System.out.println("delete outputFile : "+outputFile);
+        System.out.println("delete outputFile : " + outputFile);
     }
 
 
     private static void writeLineToOutput(String line, String outputFile) {
-        try
-        {
-            FileWriter fw = new FileWriter(outputFile,true); //the true will append the new data
-            fw.write("<p>"+line+"</p>");
+        try {
+            FileWriter fw = new FileWriter(outputFile, true); //the true will append the new data
+            fw.write("<p>" + line + "</p>");
             fw.close();
-            System.out.println("wirte line to out put- line : "+line+"\n");
-        }
-        catch(IOException ioe)
-        {
+            System.out.println("write line to out put- line : " + line + "\n");
+        } catch (IOException ioe) {
             System.err.println("IOException: " + ioe.getMessage());
         }
     }
@@ -317,7 +337,7 @@ public class Manager {
         System.out.println("clean queues\n");
     }
 
-    public static String createQueue(String queue,SqsClient sqs) {
+    public static String createQueue(String queue, SqsClient sqs) {
         try {
             CreateQueueRequest request = CreateQueueRequest.builder()
                     .queueName(queue)
@@ -338,7 +358,7 @@ public class Manager {
         lines.add("#! /bin/bash");
         lines.add("cd home/ec2-user/");
         lines.add("wget " + workerJar + " -O worker.jar");
-        lines.add("java -jar worker.jar &> log.txt");
+        lines.add("java -Xmx30g -jar worker.jar &> log.txt");
         return new String(Base64.getEncoder().encode(join(lines, "\n").getBytes()));
 
     }
@@ -357,8 +377,8 @@ public class Manager {
     }
 
     public static void createWorkers(int numberOfWorkersToCreate) {
-        System.out.println("Manager: creating "+ numberOfWorkersToCreate + " worker ec2 instances");
-        if(numberOfWorkersToCreate<=0){
+        System.out.println("Manager: creating " + numberOfWorkersToCreate + " worker ec2 instances");
+        if (numberOfWorkersToCreate <= 0) {
             return;
         }
         try {
@@ -366,7 +386,7 @@ public class Manager {
                 workerInstances++;
                 RunInstancesRequest runRequest = RunInstancesRequest.builder()
                         .imageId(workerAmi)
-                        .instanceType(InstanceType.T2_MICRO)
+                        .instanceType(InstanceType.T2_SMALL)
                         .maxCount(1)
                         .minCount(1)
                         .iamInstanceProfile(IamInstanceProfileSpecification.builder().arn("arn:aws:iam::577569430471:instance-profile/workerRole").build())
