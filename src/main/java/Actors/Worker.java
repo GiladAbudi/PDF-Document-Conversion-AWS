@@ -43,8 +43,7 @@ public class Worker {
         String queueNameManager2Worker = "M2W";
 
         SqsClient sqs = SqsClient.builder().region(Region.US_EAST_1).build();
-        bucket = "bucket1586960757979w";//"bucket" + System.currentTimeMillis();
-
+        bucket = "bucket1586960757978w";//"bucket" + System.currentTimeMillis();
         //s3 instance
         s3 = S3Client.builder().region(Region.US_EAST_1).build();
         //createBucket(bucket);
@@ -287,6 +286,7 @@ public class Worker {
                 .messageBody(output)
                 .delaySeconds(5)
                 .build();
+
         sqs.sendMessage(send_msg_request);
         System.out.println("Finish send msg to manager");
     }
