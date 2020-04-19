@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/file.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Worker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Actors/Manager.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Manager.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Actors/Worker.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Actors/Worker.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/App/LocalApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/App/LocalApp.class" afterDir="false" />
@@ -44,23 +46,10 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Application.Manager">
-    <configuration name="EC2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Cloud.EC2" />
-      <module name="Dsp1" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="Cloud.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Application.LocalApp2">
     <configuration name="LocalApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="App.LocalApp" />
-      <module name="Dsp1" />
+      <module name="DSP202ASS1" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="App.*" />
@@ -71,9 +60,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="LocalApp2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="App.LocalApp" />
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Manager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Actors.Manager" />
-      <module name="Dsp1" />
+      <module name="DSP202ASS1" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="Actors.*" />
@@ -97,9 +93,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TestTime" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="TestTime" />
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Worker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Actors.Worker" />
-      <module name="Dsp1" />
+      <module name="DSP202ASS1" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="Actors.*" />
@@ -110,20 +119,46 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Worker2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Actors.Worker" />
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Worker3" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Actors.Worker" />
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Worker4" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Actors.Worker" />
+      <module name="DSP202ASS1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
-      <item itemvalue="Application.EC2" />
+      <item itemvalue="Application.Unnamed" />
+      <item itemvalue="Application.Worker2" />
+      <item itemvalue="Application.Worker3" />
+      <item itemvalue="Application.Worker4" />
+      <item itemvalue="Application.LocalApp2" />
       <item itemvalue="Application.LocalApp" />
       <item itemvalue="Application.Manager" />
       <item itemvalue="Application.S3" />
       <item itemvalue="Application.Worker" />
+      <item itemvalue="Application.TestTime" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.Worker" />
+        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.LocalApp" />
+        <item itemvalue="Application.TestTime" />
         <item itemvalue="Application.S3" />
-        <item itemvalue="Application.EC2" />
       </list>
     </recent_temporary>
   </component>
@@ -151,6 +186,12 @@
       <updated>1586704045514</updated>
       <workItem from="1586704049980" duration="7854000" />
       <workItem from="1586795952686" duration="25950000" />
+      <workItem from="1587126721937" duration="8415000" />
+      <workItem from="1587147579571" duration="652000" />
+      <workItem from="1587202810873" duration="7715000" />
+      <workItem from="1587213592925" duration="6755000" />
+      <workItem from="1587225856834" duration="5866000" />
+      <workItem from="1587292055401" duration="1611000" />
     </task>
     <servers />
   </component>
@@ -158,10 +199,38 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="485" y="72" key="#LocalApp" timestamp="1587128407500">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="485" y="72" key="#LocalApp/0.0.1536.824@0.0.1536.824" timestamp="1587128407500" />
+    <state x="485" y="72" key="#Manager" timestamp="1587128385615">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="485" y="72" key="#Manager/0.0.1536.824@0.0.1536.824" timestamp="1587128385615" />
     <state x="361" y="71" key="#Project_Structure" timestamp="1586768963018">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="361" y="71" key="#Project_Structure/0.0.1536.826@0.0.1536.826" timestamp="1586768963018" />
+    <state x="485" y="72" key="#Worker" timestamp="1587128417894">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="485" y="72" key="#Worker/0.0.1536.824@0.0.1536.824" timestamp="1587128417894" />
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587294793927">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1587294793927" />
+    <state x="574" y="123" key="#com.intellij.ide.util.MemberChooser" timestamp="1587215791408">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="574" y="123" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1587215791408" />
+    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1587294790088">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1587294790088" />
+    <state x="618" y="302" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1587126738549">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="618" y="302" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1536.824@0.0.1536.824" timestamp="1587126738549" />
     <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog" timestamp="1586773441159">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -170,49 +239,59 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1586769521559" />
-    <state width="1492" height="206" key="GridCell.Tab.0.bottom" timestamp="1587126536357">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="193" key="GridCell.Tab.0.bottom" timestamp="1587295039434">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="193" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587295039434" />
     <state width="1492" height="206" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
-    <state width="1492" height="206" key="GridCell.Tab.0.center" timestamp="1587126536357">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="193" key="GridCell.Tab.0.center" timestamp="1587295039434">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="193" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1587295039434" />
     <state width="1492" height="206" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
-    <state width="1492" height="206" key="GridCell.Tab.0.left" timestamp="1587126536357">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="193" key="GridCell.Tab.0.left" timestamp="1587295039434">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="193" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1587295039434" />
     <state width="1492" height="206" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
-    <state width="1492" height="206" key="GridCell.Tab.0.right" timestamp="1587126536357">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="193" key="GridCell.Tab.0.right" timestamp="1587295039434">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="193" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1587295039434" />
     <state width="1492" height="206" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587126536357" />
-    <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1586946887151">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1587220361624">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587220361624" />
     <state width="1492" height="256" key="GridCell.Tab.1.bottom/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
-    <state width="1492" height="256" key="GridCell.Tab.1.center" timestamp="1586946887151">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1587220361624">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1587220361624" />
     <state width="1492" height="256" key="GridCell.Tab.1.center/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
-    <state width="1492" height="256" key="GridCell.Tab.1.left" timestamp="1586946887151">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1587220361624">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1587220361624" />
     <state width="1492" height="256" key="GridCell.Tab.1.left/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
-    <state width="1492" height="256" key="GridCell.Tab.1.right" timestamp="1586946887151">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1587220361624">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1587220361624" />
     <state width="1492" height="256" key="GridCell.Tab.1.right/0.0.1536.826@0.0.1536.826" timestamp="1586946887151" />
     <state x="277" y="0" key="SettingsEditor" timestamp="1586945439498">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1586945439498" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1586795952188">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state x="465" y="235" key="com.intellij.ide.util.TipDialog" timestamp="1587295147660">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state x="465" y="235" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1587295147660" />
     <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.826@0.0.1536.826" timestamp="1586795952188" />
-    <state x="499" y="168" key="extract.method.dialog" timestamp="1587125210205">
-      <screen x="0" y="0" width="1536" height="826" />
+    <state x="626" y="220" key="extract.method.dialog" timestamp="1587126934968">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state x="626" y="220" key="extract.method.dialog/0.0.1536.824@0.0.1536.824" timestamp="1587126934968" />
     <state x="499" y="168" key="extract.method.dialog/0.0.1536.826@0.0.1536.826" timestamp="1587125210205" />
     <state x="209" y="114" key="new project wizard" timestamp="1586769648430">
       <screen x="0" y="0" width="1536" height="826" />
@@ -223,19 +302,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>76</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/App/LocalApp.java</url>
-          <line>55</line>
+          <line>47</line>
           <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/Actors/Manager.java</url>
-          <line>50</line>
-          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -254,8 +254,8 @@ public class Worker {
         String action = pharseline[0];
         String url = pharseline[1];
         String[] slashParse = url.split("/");
-        String fileName = "output/" + slashParse[slashParse.length - 1];      // output/___.pdf
-        String name = fileName.split("\\.")[0];                    // output/___
+        String fileName =   slashParse[slashParse.length - 1];      // ___.pdf
+        String name = fileName.split("\\.")[0];               // ___
         try {
             TimeLimiter limiter = new SimpleTimeLimiter();
             res = limiter.callWithTimeout(()-> {
