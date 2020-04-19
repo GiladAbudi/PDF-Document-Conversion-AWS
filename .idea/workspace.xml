@@ -2,18 +2,18 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="LocalApp:jar" />
+      <artifact name="manager:jar" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e456d549-f62c-4f68-af4f-5e878edfce10" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/input-sample-1.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output1587291824800.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output1587292456066.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/output1587294189596.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Actors/LineHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/Actors/LineHandler.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/input1587295564980.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/output1587295564980.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Actors/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/LocalApp_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/manager_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/LocalApp_jar/output.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/manager_jar/manager.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output.html" beforeDir="false" afterPath="$PROJECT_DIR$/output.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Actors/Manager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/App/LocalApp.java" afterDir="false" />
@@ -51,7 +51,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/App" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/Actors" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15429688" />
@@ -141,8 +141,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.LocalApp" />
+        <item itemvalue="Application.Manager" />
         <item itemvalue="Application.Worker" />
         <item itemvalue="Application.S3" />
         <item itemvalue="Application.EC2" />
@@ -173,7 +173,7 @@
       <updated>1586704045514</updated>
       <workItem from="1586704049980" duration="7854000" />
       <workItem from="1586795952686" duration="25950000" />
-      <workItem from="1587288373893" duration="6255000" />
+      <workItem from="1587288373893" duration="10100000" />
     </task>
     <servers />
   </component>
@@ -192,34 +192,34 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.826@0.0.1536.826" timestamp="1587289912729" />
-    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1587289910989">
+    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1587298483241">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.826@0.0.1536.826" timestamp="1587289910989" />
+    <state x="527" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.826@0.0.1536.826" timestamp="1587298483241" />
     <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog" timestamp="1586773441159">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state x="537" y="198" key="#com.intellij.tools.ToolEditorDialog/0.0.1536.826@0.0.1536.826" timestamp="1586773441159" />
-    <state x="549" y="154" key="FileChooserDialogImpl" timestamp="1587233783274">
+    <state x="549" y="154" key="FileChooserDialogImpl" timestamp="1587298486743">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1587233783274" />
-    <state width="1492" height="149" key="GridCell.Tab.0.bottom" timestamp="1587294863299">
+    <state x="549" y="154" key="FileChooserDialogImpl/0.0.1536.826@0.0.1536.826" timestamp="1587298486743" />
+    <state width="1492" height="149" key="GridCell.Tab.0.bottom" timestamp="1587298773710">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="149" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587294863299" />
-    <state width="1492" height="149" key="GridCell.Tab.0.center" timestamp="1587294863299">
+    <state width="1492" height="149" key="GridCell.Tab.0.bottom/0.0.1536.826@0.0.1536.826" timestamp="1587298773710" />
+    <state width="1492" height="149" key="GridCell.Tab.0.center" timestamp="1587298773710">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="149" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587294863299" />
-    <state width="1492" height="149" key="GridCell.Tab.0.left" timestamp="1587294863299">
+    <state width="1492" height="149" key="GridCell.Tab.0.center/0.0.1536.826@0.0.1536.826" timestamp="1587298773710" />
+    <state width="1492" height="149" key="GridCell.Tab.0.left" timestamp="1587298773710">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="149" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587294863299" />
-    <state width="1492" height="149" key="GridCell.Tab.0.right" timestamp="1587294863299">
+    <state width="1492" height="149" key="GridCell.Tab.0.left/0.0.1536.826@0.0.1536.826" timestamp="1587298773710" />
+    <state width="1492" height="149" key="GridCell.Tab.0.right" timestamp="1587298773710">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state width="1492" height="149" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587294863299" />
+    <state width="1492" height="149" key="GridCell.Tab.0.right/0.0.1536.826@0.0.1536.826" timestamp="1587298773710" />
     <state width="1492" height="256" key="GridCell.Tab.1.bottom" timestamp="1587235043592">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
@@ -236,10 +236,10 @@
       <screen x="0" y="0" width="1536" height="826" />
     </state>
     <state width="1492" height="256" key="GridCell.Tab.1.right/0.0.1536.826@0.0.1536.826" timestamp="1587235043592" />
-    <state x="277" y="0" key="SettingsEditor" timestamp="1587233806682">
+    <state x="277" y="0" key="SettingsEditor" timestamp="1587298496916">
       <screen x="0" y="0" width="1536" height="826" />
     </state>
-    <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1587233806682" />
+    <state x="277" y="0" key="SettingsEditor/0.0.1536.826@0.0.1536.826" timestamp="1587298496916" />
     <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1587288379436">
       <screen x="0" y="0" width="1536" height="826" />
     </state>

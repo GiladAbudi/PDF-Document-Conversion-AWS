@@ -153,7 +153,7 @@ public class Manager {
 //                        reader.close();
 //                        File f = new File("input" + appId + ".txt");
 //                        f.delete();
-                        waitForWorkersToStart();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println("Got Exception while reading input file" + e.getMessage());
@@ -165,6 +165,7 @@ public class Manager {
                     sqs.deleteMessage(deleteRequest);
                     AppHandler handler = new AppHandler(linesCounter, workerOQUrl, appId, bucket, key, toAppUrl);
                     executor.execute(handler);
+                    waitForWorkersToStart();
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
@@ -275,6 +276,7 @@ public class Manager {
         String outputFile = "output" + appId + ".html";
         while (lineCount != 0) {
             try {
+                Thread.sleep(1000);
                 ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                         .queueUrl(queue)
                         .build();
@@ -300,8 +302,8 @@ public class Manager {
                     }
                 }
             }
-            catch(Ec2Exception e){
-                System.out.println("receieved Ec2Exception: " +e.getMessage());
+            catch(Exception e){
+                System.out.println("receieved Exception while reading PDF done from workers: " +e.getMessage());
             }
         }
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(outputFile).acl(ObjectCannedACL.PUBLIC_READ)

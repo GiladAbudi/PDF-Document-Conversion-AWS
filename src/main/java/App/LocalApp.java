@@ -43,13 +43,13 @@ public class LocalApp {
         String linesPerWorker = "1";//args[3]
         String outputName = "output.html";//args [2]
         String inputFile = "input-sample-1.txt"; // args[1]
-        boolean terminate = true; //args[4]
+        boolean terminate = false; //args[4]
         String appId = ""+ System.currentTimeMillis();
         String key = appId+inputFile;
         String bucket = "bucket1586960757978l";
-//        if(!isRunning("Manager")){
-//            createManager();
-//        }
+        if(!isRunning("Manager")){
+            createManager();
+        }
         s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key).acl(ObjectCannedACL.PUBLIC_READ)
                         .build(),
                 RequestBody.fromFile(Paths.get(inputFile)));
