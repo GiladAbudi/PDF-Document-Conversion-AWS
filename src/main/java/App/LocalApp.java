@@ -5,11 +5,9 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2ClientBuilder;
 import software.amazon.awssdk.services.ec2.model.*;
+import software.amazon.awssdk.services.ec2.model.Tag;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
 import software.amazon.awssdk.services.ec2.Ec2Client;
@@ -36,14 +34,27 @@ public class LocalApp {
     private static final String managerAmi = "ami-076515f20540e6e0b";
 
     public static void main(String[] args) {
+        if(args.length!=3 &&args.length!=4){
+            System.out.println("invalid num of arguments");
+            System.exit(-1);
+        }
         Region region = Region.US_EAST_1;
         ec2= Ec2Client.builder().region(region).build();
         sqs = SqsClient.builder().region(region).build();
         s3 = S3Client.builder().region(region).build();
-        String linesPerWorker = "1";//args[3]
-        String outputName = "output.html";//args [2]
-        String inputFile = "input-sample-1.txt"; // args[1]
+        String linesPerWorker = args[2];
+        try{
+            Integer.parseInt(linesPerWorker);
+        }catch(Exception e){
+            System.out.println("bad argument for n");
+            System.exit(-1);
+        }
+        String outputName = args[1];//args [2]
+        String inputFile = args[0]; // args[1]
         boolean terminate = false; //args[4]
+        if(args[args.length-1].equals("terminate")){
+            terminate=true;
+        }
         String appId = ""+ System.currentTimeMillis();
         String key = appId+inputFile;
         String bucket = "bucket1586960757978l";
@@ -91,6 +102,7 @@ public class LocalApp {
                                     .receiptHandle(m.receiptHandle())
                                     .build();
                             sqs.deleteMessage(deleteRequest);
+                            System.out.println("output link: "+fileLink);
                             if (!fileLink.equals("")){
                                 try (BufferedInputStream in = new BufferedInputStream(new URL(fileLink).openStream());
 
@@ -100,8 +112,9 @@ public class LocalApp {
                                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                                         fileOutputStream.write(dataBuffer, 0, bytesRead);
                                     }
+                                    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucket).key("output" + appId+".html").build();
+                                    s3.deleteObject(deleteObjectRequest);
                                     sqs.deleteMessage(deleteRequest);
-                                    System.out.println("output link: "+fileLink);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -117,6 +130,7 @@ public class LocalApp {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+
                         }
                     }
                 }

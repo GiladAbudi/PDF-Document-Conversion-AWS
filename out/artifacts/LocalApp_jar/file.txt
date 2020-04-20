@@ -1,3 +1,0 @@
-ToImage	http://www.russanddaughters.com/userfiles/files/PASSOVER%20MENU%202013%20one%20page.pdf
-ToHTML	http://www.bagelworld.ca/2014passoverordersheet.pdf
-ToText	http://www.morashasyllabus.com/class/The%20Passover%20Seder.pdf

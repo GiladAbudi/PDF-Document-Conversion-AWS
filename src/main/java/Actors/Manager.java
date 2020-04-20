@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Manager {
@@ -276,7 +275,6 @@ public class Manager {
         String outputFile = "output" + appId + ".html";
         while (lineCount != 0) {
             try {
-                Thread.sleep(1000);
                 ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                         .queueUrl(queue)
                         .build();
